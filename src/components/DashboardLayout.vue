@@ -49,8 +49,6 @@ const activeMenu = computed(() => {
     Update: "update",
     AppSettings: "app-settings",
     HelpLink: "help-link",
-    WebService: "web-service",
-    EditAccount: "edit-account",
   };
   
   return routeToMenuId[routeName] || "dashboard";
@@ -66,8 +64,6 @@ const menuItems = [
   { id: "update", label: "آپدیت", icon: "🔄", route: "Update" },
   { id: "app-settings", label: "تنظیمات برنامه", icon: "🔧", route: "AppSettings" },
   { id: "help-link", label: "لینک کمکی", icon: "🔗", route: "HelpLink" },
-  { id: "web-service", label: "وب سرویس", icon: "🌐", route: "WebService" },
-  { id: "edit-account", label: "ویرایش حساب", icon: "✏️", route: "EditAccount" },
   {
     id: "logout",
     label: "خروج از حساب",

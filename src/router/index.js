@@ -65,18 +65,6 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/web-service',
-      name: 'WebService',
-      component: () => import('../views/WebService.vue'),
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/edit-account',
-      name: 'EditAccount',
-      component: () => import('../views/EditAccount.vue'),
-      meta: { requiresAuth: true }
-    },
-    {
       path: '/',
       redirect: '/login'
     }
