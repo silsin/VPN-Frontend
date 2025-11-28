@@ -19,6 +19,7 @@
       <ConfigModal
         :is-open="isModalOpen"
         :editing-config="editingConfig"
+        category="splash"
         @close="closeModal"
         @save="handleSave"
       />
@@ -27,7 +28,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onActivated } from 'vue'
 import DashboardLayout from "../components/DashboardLayout.vue"
 import ConfigSearchFilter from "../components/ConfigSearchFilter.vue"
 import ConfigTable from "../components/ConfigTable.vue"
@@ -67,7 +68,12 @@ const handleSave = () => {
 
 // بارگذاری داده‌ها در زمان mount
 onMounted(() => {
-  configStore.loadConfigs()
+  configStore.loadConfigs('splash')
+})
+
+// بارگذاری مجدد هنگام بازگشت به صفحه
+onActivated(() => {
+  configStore.loadConfigs('splash')
 })
 </script>
 

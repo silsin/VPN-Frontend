@@ -30,28 +30,33 @@
             <td>
               <span
                 class="ad-type"
-                :class="ad.type === 'banner' ? 'type-banner' : 'type-video'"
+                :class="{
+                  'type-banner': ad.type === 'banner',
+                  'type-video': ad.type === 'video_ad',
+                  'type-reward': ad.type === 'reward'
+                }"
               >
                 <span class="type-icon" v-if="ad.type === 'banner'">📄</span>
-                <span class="type-icon" v-else>🎥</span>
-                {{ ad.type === 'banner' ? 'بنر' : 'ویدیو' }}
+                <span class="type-icon" v-else-if="ad.type === 'video_ad'">🎥</span>
+                <span class="type-icon" v-else>🎁</span>
+                {{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}
               </span>
             </td>
             <td>
               <span class="platform-badge" :class="ad.platform">
                 <span v-if="ad.platform === 'android'">🤖</span>
                 <span v-else-if="ad.platform === 'ios'">🍎</span>
-                <span v-else>📱</span>
-                {{ ad.platform === 'both' ? 'هر دو' : ad.platform === 'android' ? 'Android' : 'iOS' }}
+                <span v-else>🌐</span>
+                {{ ad.platform === 'android' ? 'Android' : ad.platform === 'ios' ? 'iOS' : 'هر دو' }}
               </span>
             </td>
             <td class="ad-key">
               <div class="key-preview">
-                {{ ad.key.length > 30 ? ad.key.substring(0, 30) + '...' : ad.key }}
+                {{ ad.adUnitId.length > 30 ? ad.adUnitId.substring(0, 30) + '...' : ad.adUnitId }}
               </div>
               <button
                 class="copy-btn"
-                @click="copyToClipboard(ad.key)"
+                @click="copyToClipboard(ad.adUnitId)"
                 title="کپی کلید"
               >
                 📋
@@ -60,9 +65,9 @@
             <td>
               <span
                 class="status-badge"
-                :class="ad.status"
+                :class="ad.isActive ? 'active' : 'inactive'"
               >
-                {{ ad.status === 'active' ? 'فعال' : 'غیرفعال' }}
+                {{ ad.isActive ? 'فعال' : 'غیرفعال' }}
               </span>
             </td>
             <td class="ad-date">
@@ -79,9 +84,9 @@
               <button
                 class="status-btn"
                 @click="$emit('toggle-status', ad)"
-                :title="ad.status === 'active' ? 'غیرفعال کردن' : 'فعال کردن'"
+                :title="ad.isActive ? 'غیرفعال کردن' : 'فعال کردن'"
               >
-                {{ ad.status === 'active' ? '🚫' : '✅' }}
+                {{ ad.isActive ? '🚫' : '✅' }}
               </button>
               <button
                 class="delete-btn"
@@ -253,6 +258,11 @@ const confirmDelete = (ad) => {
   color: #ea580c;
 }
 
+.type-reward {
+  background: rgba(168, 85, 247, 0.1);
+  color: #9333ea;
+}
+
 .platform-badge {
   padding: 4px 12px;
   border-radius: 20px;
@@ -273,6 +283,11 @@ const confirmDelete = (ad) => {
 .platform-badge.ios {
   background: rgba(239, 68, 68, 0.1);
   color: #dc2626;
+}
+
+.platform-badge.both {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
 }
 
 .ad-key {

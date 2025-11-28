@@ -8,12 +8,12 @@
       
       <form @submit.prevent="handleLogin" class="login-form">
         <div class="form-group">
-          <label for="username">نام کاربری</label>
+          <label for="email">ایمیل</label>
           <input
-            id="username"
-            v-model="username"
-            type="text"
-            placeholder="نام کاربری خود را وارد کنید"
+            id="email"
+            v-model="email"
+            type="email"
+            placeholder="ایمیل خود را وارد کنید"
             required
             :disabled="loading"
           />
@@ -52,7 +52,7 @@ import { useAuthStore } from '../stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
-const username = ref('')
+const email = ref('')
 const password = ref('')
 const loading = ref(false)
 const error = ref('')
@@ -62,15 +62,12 @@ const handleLogin = async () => {
   loading.value = true
   
   try {
-    // شبیه‌سازی تاخیر API
-    await new Promise(resolve => setTimeout(resolve, 500))
+    const result = await authStore.login(email.value, password.value)
     
-    const success = authStore.login(username.value, password.value)
-    
-    if (success) {
+    if (result.success) {
       router.push('/dashboard')
     } else {
-      error.value = 'نام کاربری یا رمز عبور اشتباه است'
+      error.value = result.error || 'ایمیل یا رمز عبور اشتباه است'
     }
   } catch (err) {
     error.value = 'خطا در ورود. لطفاً دوباره تلاش کنید.'

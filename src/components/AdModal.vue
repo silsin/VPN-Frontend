@@ -36,11 +36,20 @@
             <button
               type="button"
               class="type-btn"
-              :class="{ active: formData.type === 'video' }"
-              @click="formData.type = 'video'"
+              :class="{ active: formData.type === 'video_ad' }"
+              @click="formData.type = 'video_ad'"
             >
               <span class="type-icon">🎥</span>
               ویدیو
+            </button>
+            <button
+              type="button"
+              class="type-btn"
+              :class="{ active: formData.type === 'reward' }"
+              @click="formData.type = 'reward'"
+            >
+              <span class="type-icon">🎁</span>
+              جایزه‌ای
             </button>
           </div>
         </div>
@@ -73,7 +82,7 @@
               :class="{ active: formData.platform === 'both' }"
               @click="formData.platform = 'both'"
             >
-              <span class="platform-icon">📱</span>
+              <span class="platform-icon">🌐</span>
               هر دو
             </button>
           </div>
@@ -81,11 +90,11 @@
 
         <!-- کلید تبلیغ -->
         <div class="form-group">
-          <label for="ad-key">کلید تبلیغ (Ad Unit ID) *</label>
+          <label for="ad-unit-id">کلید تبلیغ (Ad Unit ID) *</label>
           <input
-            id="ad-key"
+            id="ad-unit-id"
             type="text"
-            v-model="formData.key"
+            v-model="formData.adUnitId"
             placeholder="مثال: ca-app-pub-3940256099942544/6300978111"
             required
             class="form-input"
@@ -95,42 +104,45 @@
           </small>
         </div>
 
-        <!-- مکان‌های نمایش تبلیغ -->
+        <!-- مکان نمایش تبلیغ -->
         <div class="form-group">
-          <label>مکان‌های نمایش تبلیغ *</label>
-          <p class="form-hint">انتخاب کنید در کدام بخش‌های اپلیکیشن این تبلیغ نمایش داده شود</p>
+          <label>مکان نمایش تبلیغ *</label>
+          <p class="form-hint">انتخاب کنید در کدام بخش اپلیکیشن این تبلیغ نمایش داده شود</p>
           <div class="placements-selector">
-            <label class="placement-checkbox">
+            <label class="placement-radio">
               <input
-                type="checkbox"
-                :checked="formData.placements.includes('splash_banner')"
-                @change="togglePlacement('splash_banner')"
-              />
-              <span class="checkmark"></span>
-              <div class="placement-info">
-                <span class="placement-icon">🏠</span>
-                <span class="placement-name">بنر اسپلش</span>
-              </div>
-            </label>
-
-            <label class="placement-checkbox">
-              <input
-                type="checkbox"
-                :checked="formData.placements.includes('home_banner')"
-                @change="togglePlacement('home_banner')"
+                type="radio"
+                name="placement"
+                value="splash"
+                v-model="formData.placement"
               />
               <span class="checkmark"></span>
               <div class="placement-info">
                 <span class="placement-icon">📱</span>
+                <span class="placement-name">بنر اسپلش</span>
+              </div>
+            </label>
+
+            <label class="placement-radio">
+              <input
+                type="radio"
+                name="placement"
+                value="main_page"
+                v-model="formData.placement"
+              />
+              <span class="checkmark"></span>
+              <div class="placement-info">
+                <span class="placement-icon">🏠</span>
                 <span class="placement-name">بنر صفحه اصلی</span>
               </div>
             </label>
 
-            <label class="placement-checkbox">
+            <label class="placement-radio">
               <input
-                type="checkbox"
-                :checked="formData.placements.includes('video_ads')"
-                @change="togglePlacement('video_ads')"
+                type="radio"
+                name="placement"
+                value="video_ad"
+                v-model="formData.placement"
               />
               <span class="checkmark"></span>
               <div class="placement-info">
@@ -139,11 +151,12 @@
               </div>
             </label>
 
-            <label class="placement-checkbox">
+            <label class="placement-radio">
               <input
-                type="checkbox"
-                :checked="formData.placements.includes('rewarded_video')"
-                @change="togglePlacement('rewarded_video')"
+                type="radio"
+                name="placement"
+                value="reward_video"
+                v-model="formData.placement"
               />
               <span class="checkmark"></span>
               <div class="placement-info">
@@ -161,8 +174,8 @@
             <button
               type="button"
               class="status-btn"
-              :class="{ active: formData.status === 'active' }"
-              @click="formData.status = 'active'"
+              :class="{ active: formData.isActive === true }"
+              @click="formData.isActive = true"
             >
               <span class="status-icon">✅</span>
               فعال
@@ -170,8 +183,8 @@
             <button
               type="button"
               class="status-btn"
-              :class="{ active: formData.status === 'inactive' }"
-              @click="formData.status = 'inactive'"
+              :class="{ active: formData.isActive === false }"
+              @click="formData.isActive = false"
             >
               <span class="status-icon">🚫</span>
               غیرفعال
@@ -220,10 +233,10 @@ const adsStore = useAdsStore()
 const formData = ref({
   name: '',
   type: 'banner',
-  platform: 'both',
-  key: '',
-  placements: [],
-  status: 'active'
+  platform: 'android',
+  adUnitId: '',
+  placement: '',
+  isActive: true
 })
 const validationError = ref('')
 const isSubmitting = ref(false)
@@ -238,33 +251,24 @@ watch(() => props.isOpen, (isOpen) => {
         name: props.editingAd.name,
         type: props.editingAd.type,
         platform: props.editingAd.platform,
-        key: props.editingAd.key,
-        placements: props.editingAd.placements || [],
-        status: props.editingAd.status
+        adUnitId: props.editingAd.adUnitId,
+        placement: props.editingAd.placement || '',
+        isActive: props.editingAd.isActive
       }
     } else {
       // حالت افزودن جدید
       formData.value = {
         name: '',
         type: 'banner',
-        platform: 'both',
-        key: '',
-        placements: [],
-        status: 'active'
+        platform: 'android',
+        adUnitId: '',
+        placement: '',
+        isActive: true
       }
     }
     validationError.value = ''
   }
 })
-
-const togglePlacement = (placement) => {
-  const index = formData.value.placements.indexOf(placement)
-  if (index > -1) {
-    formData.value.placements.splice(index, 1)
-  } else {
-    formData.value.placements.push(placement)
-  }
-}
 
 const validateForm = () => {
   if (!formData.value.name.trim()) {
@@ -272,19 +276,19 @@ const validateForm = () => {
     return false
   }
 
-  if (!formData.value.key.trim()) {
+  if (!formData.value.adUnitId.trim()) {
     validationError.value = 'کلید تبلیغ نمی‌تواند خالی باشد'
     return false
   }
 
-  if (!formData.value.placements || formData.value.placements.length === 0) {
-    validationError.value = 'حداقل یک مکان نمایش برای تبلیغ انتخاب کنید'
+  if (!formData.value.placement) {
+    validationError.value = 'مکان نمایش تبلیغ را انتخاب کنید'
     return false
   }
 
   // اعتبارسنجی فرمت Ad Unit ID (اختیاری)
   const adUnitIdPattern = /^ca-app-pub-\d+\/\d+$/
-  if (!adUnitIdPattern.test(formData.value.key.trim())) {
+  if (!adUnitIdPattern.test(formData.value.adUnitId.trim())) {
     validationError.value = 'فرمت کلید تبلیغ نامعتبر است. از فرمت ca-app-pub-XXXX/YYYY استفاده کنید'
     return false
   }
@@ -292,7 +296,7 @@ const validateForm = () => {
   const validation = adsStore.validateAd({
     ...formData.value,
     name: formData.value.name.trim(),
-    key: formData.value.key.trim()
+    adUnitId: formData.value.adUnitId.trim()
   })
 
   if (!validation.isValid) {
@@ -314,15 +318,15 @@ const handleSubmit = async () => {
       name: formData.value.name.trim(),
       type: formData.value.type,
       platform: formData.value.platform,
-      key: formData.value.key.trim(),
-      placements: formData.value.placements,
-      status: formData.value.status
+      adUnitId: formData.value.adUnitId.trim(),
+      placement: formData.value.placement,
+      isActive: formData.value.isActive
     }
 
     if (isEditing.value) {
-      adsStore.updateAd(props.editingAd.id, adData)
+      await adsStore.updateAd(props.editingAd.id, adData)
     } else {
-      adsStore.addAd(adData)
+      await adsStore.addAd(adData)
     }
 
     emit('save')
@@ -500,7 +504,7 @@ const closeModal = () => {
   margin-top: 8px;
 }
 
-.placement-checkbox {
+.placement-radio {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -514,12 +518,12 @@ const closeModal = () => {
   position: relative;
 }
 
-.placement-checkbox:hover {
+.placement-radio:hover {
   border-color: #667eea;
   background: rgba(102, 126, 234, 0.05);
 }
 
-.placement-checkbox input[type="checkbox"] {
+.placement-radio input[type="radio"] {
   display: none;
 }
 
@@ -536,7 +540,7 @@ const closeModal = () => {
   justify-content: center;
 }
 
-.placement-checkbox input:checked ~ .checkmark {
+.placement-radio input:checked ~ .checkmark {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
@@ -553,7 +557,7 @@ const closeModal = () => {
   transform: rotate(45deg);
 }
 
-.placement-checkbox input:checked ~ .checkmark:after {
+.placement-radio input:checked ~ .checkmark:after {
   display: block;
 }
 

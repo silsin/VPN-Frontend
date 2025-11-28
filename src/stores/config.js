@@ -1,101 +1,133 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
-
-// نمونه داده‌های اولیه برای تست
-const initialConfigs = [
-  {
-    id: '1',
-    name: 'کانفیگ ایران ۱',
-    type: 'link', // 'link' or 'json'
-    content: 'vless://example@server.com:443?type=tcp&security=tls#Iran-1',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '2',
-    name: 'کانفیگ آمریکا',
-    type: 'json',
-    content: JSON.stringify({
-      "v": "2",
-      "ps": "USA Config",
-      "add": "server.example.com",
-      "port": "443",
-      "id": "uuid-here",
-      "aid": "0",
-      "net": "tcp",
-      "type": "none",
-      "host": "",
-      "path": "",
-      "tls": "tls"
-    }, null, 2),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-]
+import api from '../services/api'
 
 export const useConfigStore = defineStore('config', () => {
   const configs = ref([])
   const searchQuery = ref('')
   const filterType = ref('all') // 'all', 'link', 'json'
+  const loading = ref(false)
+  const error = ref(null)
+  const stats = ref({
+    total: 0,
+    links: 0,
+    jsons: 0
+  })
 
-  // بارگذاری داده‌ها از localStorage
-  const loadConfigs = () => {
-    const stored = localStorage.getItem('v2rayConfigs')
-    if (stored) {
-      try {
-        configs.value = JSON.parse(stored)
-      } catch (e) {
-        console.error('Error loading configs:', e)
-        configs.value = initialConfigs
-      }
-    } else {
-      configs.value = initialConfigs
-      saveConfigs()
+  // Helper to normalize config from API
+  const normalizeConfig = (config) => {
+    return {
+      ...config,
+      type: config.type === 'v2ray_link' ? 'link' : (config.type === 'json_config' ? 'json' : config.type)
     }
   }
 
-  // ذخیره داده‌ها در localStorage
-  const saveConfigs = () => {
-    localStorage.setItem('v2rayConfigs', JSON.stringify(configs.value))
+  // Helper to denormalize config for API
+  const denormalizeConfig = (config) => {
+    return {
+      ...config,
+      type: config.type === 'link' ? 'v2ray_link' : 'json_config'
+    }
+  }
+
+  // بارگذاری داده‌ها از API
+  const loadConfigs = async (category = null) => {
+    loading.value = true
+    error.value = null
+    configs.value = [] // Clear existing configs
+    try {
+      const params = {}
+      if (category) {
+        params.category = category
+      }
+      
+      console.log('Loading configs with category:', category)
+      const response = await api.get('/v2ray-configs', { params })
+      console.log('Received configs:', response.data)
+      configs.value = response.data.map(normalizeConfig)
+      
+      // Also fetch stats
+      fetchStats()
+    } catch (e) {
+      console.error('Error loading configs:', e)
+      error.value = 'خطا در بارگذاری اطلاعات'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const fetchStats = async () => {
+    try {
+      const response = await api.get('/v2ray-configs/stats')
+      // Map API stats to frontend stats
+      stats.value = {
+        total: response.data.total,
+        links: response.data.linkCount,
+        jsons: response.data.jsonCount
+      }
+    } catch (e) {
+      console.error('Error loading stats:', e)
+    }
   }
 
   // افزودن کانفیگ جدید
-  const addConfig = (config) => {
-    const newConfig = {
-      id: Date.now().toString(),
-      ...config,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+  const addConfig = async (config) => {
+    loading.value = true
+    try {
+      const payload = denormalizeConfig(config)
+      
+      const response = await api.post('/v2ray-configs', payload)
+      const newConfig = normalizeConfig(response.data)
+      configs.value.push(newConfig)
+      fetchStats()
+      return newConfig
+    } catch (e) {
+      console.error('Error adding config:', e)
+      throw e
+    } finally {
+      loading.value = false
     }
-    configs.value.push(newConfig)
-    saveConfigs()
-    return newConfig
   }
 
   // بروزرسانی کانفیگ
-  const updateConfig = (id, updatedConfig) => {
-    const index = configs.value.findIndex(config => config.id === id)
-    if (index !== -1) {
-      configs.value[index] = {
-        ...configs.value[index],
-        ...updatedConfig,
-        updatedAt: new Date().toISOString()
+  const updateConfig = async (id, updatedConfig) => {
+    loading.value = true
+    try {
+      const payload = denormalizeConfig(updatedConfig)
+      
+      const response = await api.patch(`/v2ray-configs/${id}`, payload)
+      const updated = normalizeConfig(response.data)
+      
+      const index = configs.value.findIndex(c => c.id === id)
+      if (index !== -1) {
+        configs.value[index] = updated
       }
-      saveConfigs()
-      return configs.value[index]
+      return updated
+    } catch (e) {
+      console.error('Error updating config:', e)
+      throw e
+    } finally {
+      loading.value = false
     }
-    return null
   }
 
   // حذف کانفیگ
-  const deleteConfig = (id) => {
-    const index = configs.value.findIndex(config => config.id === id)
-    if (index !== -1) {
-      configs.value.splice(index, 1)
-      saveConfigs()
+  const deleteConfig = async (id) => {
+    loading.value = true
+    try {
+      await api.delete(`/v2ray-configs/${id}`)
+      const index = configs.value.findIndex(c => c.id === id)
+      if (index !== -1) {
+        configs.value.splice(index, 1)
+      }
+      fetchStats()
       return true
+    } catch (e) {
+      console.error('Error deleting config:', e)
+      throw e
+    } finally {
+      loading.value = false
     }
-    return false
   }
 
   // گرفتن کانفیگ بر اساس ID
@@ -113,7 +145,7 @@ export const useConfigStore = defineStore('config', () => {
     filterType.value = type
   }
 
-  // کانفیگ‌های فیلتر شده
+  // کانفیگ‌های فیلتر شده (Client-side filtering)
   const filteredConfigs = computed(() => {
     let filtered = configs.value
 
@@ -133,15 +165,6 @@ export const useConfigStore = defineStore('config', () => {
 
     // مرتب‌سازی بر اساس تاریخ بروزرسانی (جدیدترین اول)
     return filtered.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-  })
-
-  // آمار کانفیگ‌ها
-  const stats = computed(() => {
-    return {
-      total: configs.value.length,
-      links: configs.value.filter(config => config.type === 'link').length,
-      jsons: configs.value.filter(config => config.type === 'json').length
-    }
   })
 
   // اعتبارسنجی کانفیگ V2Ray
@@ -172,15 +195,14 @@ export const useConfigStore = defineStore('config', () => {
     return { isValid: true, error: null }
   }
 
-  // مقداردهی اولیه
-  loadConfigs()
-
   return {
     configs,
     searchQuery,
     filterType,
     filteredConfigs,
     stats,
+    loading,
+    error,
     addConfig,
     updateConfig,
     deleteConfig,
@@ -189,6 +211,6 @@ export const useConfigStore = defineStore('config', () => {
     setFilterType,
     validateV2RayConfig,
     loadConfigs,
-    saveConfigs
+    fetchStats
   }
 })

@@ -95,8 +95,8 @@ const closeModal = () => {
 };
 
 const toggleAdStatus = (ad) => {
-  const newStatus = ad.status === "active" ? "inactive" : "active";
-  adsStore.updateAd(ad.id, { status: newStatus });
+  const newStatus = !ad.isActive;
+  adsStore.updateAd(ad.id, { isActive: newStatus });
 };
 
 const deleteAd = (adId) => {

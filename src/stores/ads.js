@@ -1,234 +1,217 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-
-// نمونه داده‌های اولیه برای تبلیغات
-const initialAds = [
-  {
-    id: '1',
-    name: 'بنر اسپلش صفحه اصلی',
-    type: 'banner', // 'banner' or 'video'
-    key: 'ca-app-pub-3940256099942544/6300978111',
-    platform: 'android', // 'android', 'ios', 'both'
-    placements: ['splash_banner'], // array of placement keys
-    status: 'active', // 'active', 'inactive'
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '2',
-    name: 'ویدیو تبلیغاتی',
-    type: 'video',
-    key: 'ca-app-pub-3940256099942544/8691691433',
-    platform: 'both',
-    placements: ['video_ads', 'rewarded_video'],
-    status: 'active',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '3',
-    name: 'بنر صفحه اصلی',
-    type: 'banner',
-    key: 'ca-app-pub-3940256099942544/1033173712',
-    platform: 'ios',
-    placements: ['home_banner'],
-    status: 'inactive',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-]
-
-// تنظیمات نمایش تبلیغات در بخش‌های مختلف
-const initialPlacements = {
-  splash_banner: ['1'], // IDs of ads enabled for splash banner
-  home_banner: ['1', '3'], // IDs of ads enabled for home banner
-  video_ads: ['2'], // IDs of ads enabled for video ads
-  rewarded_video: [], // IDs of ads enabled for rewarded video
-}
+import api from '../services/api'
 
 export const useAdsStore = defineStore('ads', () => {
   const ads = ref([])
-  const placements = ref({})
+  const settings = ref({})
+  const loading = ref(false)
+  const error = ref(null)
 
-  // بارگذاری داده‌ها از localStorage
-  const loadAds = () => {
-    const storedAds = localStorage.getItem('adsData')
-    const storedPlacements = localStorage.getItem('adsPlacements')
+  // Load ads from backend
+  const loadAds = async () => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await api.get('/ads')
+      ads.value = response.data
+    } catch (err) {
+      error.value = 'خطا در بارگذاری تبلیغات'
+      console.error('Error loading ads:', err)
+    } finally {
+      loading.value = false
+    }
+  }
 
-    if (storedAds) {
-      try {
-        ads.value = JSON.parse(storedAds)
-      } catch (e) {
-        console.error('Error loading ads:', e)
-        ads.value = initialAds
+  // Load settings from backend
+  const loadSettings = async () => {
+    try {
+      const response = await api.get('/ads/settings')
+      settings.value = response.data
+    } catch (err) {
+      error.value = 'خطا در بارگذاری تنظیمات'
+      console.error('Error loading settings:', err)
+    }
+  }
+
+  // Add new ad
+  const addAd = async (adData) => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await api.post('/ads', adData)
+      ads.value.push(response.data)
+      return response.data
+    } catch (err) {
+      error.value = 'خطا در افزودن تبلیغ'
+      console.error('Error adding ad:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Update ad
+  const updateAd = async (id, updatedData) => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await api.patch(`/ads/${id}`, updatedData)
+      const index = ads.value.findIndex(ad => ad.id === id)
+      if (index !== -1) {
+        ads.value[index] = response.data
       }
-    } else {
-      ads.value = initialAds
-      saveAds()
+      return response.data
+    } catch (err) {
+      error.value = 'خطا در بروزرسانی تبلیغ'
+      console.error('Error updating ad:', err)
+      throw err
+    } finally {
+      loading.value = false
     }
+  }
 
-    if (storedPlacements) {
-      try {
-        placements.value = JSON.parse(storedPlacements)
-      } catch (e) {
-        console.error('Error loading placements:', e)
-        placements.value = initialPlacements
+  // Delete ad
+  const deleteAd = async (id) => {
+    loading.value = true
+    error.value = null
+    try {
+      await api.delete(`/ads/${id}`)
+      const index = ads.value.findIndex(ad => ad.id === id)
+      if (index !== -1) {
+        ads.value.splice(index, 1)
       }
-    } else {
-      placements.value = initialPlacements
-      savePlacements()
-    }
-  }
-
-  // ذخیره تبلیغات در localStorage
-  const saveAds = () => {
-    localStorage.setItem('adsData', JSON.stringify(ads.value))
-  }
-
-  // ذخیره تنظیمات نمایش در localStorage
-  const savePlacements = () => {
-    localStorage.setItem('adsPlacements', JSON.stringify(placements.value))
-  }
-
-  // افزودن تبلیغ جدید
-  const addAd = (ad) => {
-    const newAd = {
-      id: Date.now().toString(),
-      ...ad,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-    ads.value.push(newAd)
-    saveAds()
-    return newAd
-  }
-
-  // بروزرسانی تبلیغ
-  const updateAd = (id, updatedAd) => {
-    const index = ads.value.findIndex(ad => ad.id === id)
-    if (index !== -1) {
-      ads.value[index] = {
-        ...ads.value[index],
-        ...updatedAd,
-        updatedAt: new Date().toISOString()
-      }
-      saveAds()
-      return ads.value[index]
-    }
-    return null
-  }
-
-  // حذف تبلیغ
-  const deleteAd = (id) => {
-    const index = ads.value.findIndex(ad => ad.id === id)
-    if (index !== -1) {
-      // حذف تبلیغ از تمام placementها
-      Object.keys(placements.value).forEach(placementKey => {
-        placements.value[placementKey] = placements.value[placementKey].filter(adId => adId !== id)
-      })
-      savePlacements()
-
-      ads.value.splice(index, 1)
-      saveAds()
       return true
+    } catch (err) {
+      error.value = 'خطا در حذف تبلیغ'
+      console.error('Error deleting ad:', err)
+      throw err
+    } finally {
+      loading.value = false
     }
-    return false
   }
 
-  // گرفتن تبلیغ بر اساس ID
+  // Get ad by ID
   const getAdById = (id) => {
     return ads.value.find(ad => ad.id === id)
   }
 
-  // مدیریت placementها
-  const toggleAdPlacement = (adId, placementKey) => {
-    if (!placements.value[placementKey]) {
-      placements.value[placementKey] = []
+  // Update setting
+  const updateSetting = async (key, value) => {
+    try {
+      const response = await api.patch('/ads/settings', { [key]: value })
+      settings.value = response.data
+      return response.data
+    } catch (err) {
+      error.value = 'خطا در بروزرسانی تنظیمات'
+      console.error('Error updating setting:', err)
+      throw err
     }
-
-    const index = placements.value[placementKey].indexOf(adId)
-    if (index > -1) {
-      placements.value[placementKey].splice(index, 1)
-    } else {
-      placements.value[placementKey].push(adId)
-    }
-    savePlacements()
   }
 
-  const isAdEnabledForPlacement = (adId, placementKey) => {
-    return placements.value[placementKey]?.includes(adId) || false
-  }
-
-  const getAdsForPlacement = (placementKey) => {
-    const enabledAdIds = placements.value[placementKey] || []
-    return ads.value.filter(ad => enabledAdIds.includes(ad.id))
-  }
-
-  // آمار تبلیغات
+  // Stats computed property
   const stats = computed(() => {
     return {
       total: ads.value.length,
-      active: ads.value.filter(ad => ad.status === 'active').length,
+      active: ads.value.filter(ad => ad.isActive === true).length,
       banners: ads.value.filter(ad => ad.type === 'banner').length,
-      videos: ads.value.filter(ad => ad.type === 'video').length,
+      videos: ads.value.filter(ad => ad.type === 'video_ad').length,
+      rewards: ads.value.filter(ad => ad.type === 'reward').length,
       android: ads.value.filter(ad => ad.platform === 'android' || ad.platform === 'both').length,
       ios: ads.value.filter(ad => ad.platform === 'ios' || ad.platform === 'both').length
     }
   })
 
-  // لیست placementها
+  // Placement types
   const placementTypes = [
-    { key: 'splash_banner', label: 'بنر اسپلش', icon: '📱' },
-    { key: 'home_banner', label: 'بنر صفحه اصلی', icon: '🏠' },
-    { key: 'video_ads', label: 'تبلیغات ویدیویی', icon: '🎥' },
-    { key: 'rewarded_video', label: 'ویدیو جایزه‌ای', icon: '🎁' }
+    { key: 'splash', label: 'بنر اسپلش', icon: '📱' },
+    { key: 'main_page', label: 'بنر صفحه اصلی', icon: '🏠' },
+    { key: 'video_ad', label: 'تبلیغات ویدیویی', icon: '🎬' },
+    { key: 'reward_video', label: 'ویدیو جایزه‌ای', icon: '🎁' }
   ]
 
-  // پلتفرم‌ها
+  // Platforms
   const platforms = [
     { value: 'android', label: 'Android' },
     { value: 'ios', label: 'iOS' },
     { value: 'both', label: 'هر دو' }
   ]
 
-  // انواع تبلیغات
+  // Ad types
   const adTypes = [
     { value: 'banner', label: 'بنر' },
-    { value: 'video', label: 'ویدیو' }
+    { value: 'video_ad', label: 'ویدیو' },
+    { value: 'reward', label: 'جایزه‌ای' }
   ]
 
-// اعتبارسنجی تبلیغ
-const validateAd = (ad) => {
-  if (!ad.name || !ad.name.trim()) {
-    return { isValid: false, error: 'نام تبلیغ نمی‌تواند خالی باشد' }
+  // Validate ad
+  const validateAd = (ad) => {
+    if (!ad.name || !ad.name.trim()) {
+      return { isValid: false, error: 'نام تبلیغ نمی‌تواند خالی باشد' }
+    }
+
+    if (!ad.adUnitId || !ad.adUnitId.trim()) {
+      return { isValid: false, error: 'کلید تبلیغ نمی‌تواند خالی باشد' }
+    }
+
+    if (!ad.placement || !ad.placement.trim()) {
+      return { isValid: false, error: 'مکان نمایش باید انتخاب شود' }
+    }
+
+    if (!['banner', 'video_ad', 'reward'].includes(ad.type)) {
+      return { isValid: false, error: 'نوع تبلیغ نامعتبر است' }
+    }
+
+    if (!['android', 'ios', 'both'].includes(ad.platform)) {
+      return { isValid: false, error: 'پلتفرم نامعتبر است' }
+    }
+
+    return { isValid: true, error: null }
   }
 
-  if (!ad.key || !ad.key.trim()) {
-    return { isValid: false, error: 'کلید تبلیغ نمی‌تواند خالی باشد' }
+  // Helper functions for placement management (for UI compatibility)
+  const placements = computed(() => {
+    const result = {
+      splash: [],
+      main_page: [],
+      video_ad: [],
+      reward_video: []
+    }
+    
+    ads.value.forEach(ad => {
+      if (ad.isActive && ad.placement && result[ad.placement]) {
+        result[ad.placement].push(ad.id)
+      }
+    })
+    
+    return result
+  })
+
+  const toggleAdPlacement = async (adId, placementKey) => {
+    const ad = getAdById(adId)
+    if (!ad) return
+
+    // Toggle by changing the placement
+    const newPlacement = ad.placement === placementKey ? null : placementKey
+    await updateAd(adId, { placement: newPlacement })
   }
 
-  if (!ad.placements || ad.placements.length === 0) {
-    return { isValid: false, error: 'حداقل یک مکان نمایش باید انتخاب شود' }
+  const isAdEnabledForPlacement = (adId, placementKey) => {
+    const ad = getAdById(adId)
+    return ad?.placement === placementKey && ad?.isActive === true
   }
 
-  if (!['banner', 'video'].includes(ad.type)) {
-    return { isValid: false, error: 'نوع تبلیغ نامعتبر است' }
+  const getAdsForPlacement = (placementKey) => {
+    return ads.value.filter(ad => ad.placement === placementKey)
   }
-
-  if (!['android', 'ios', 'both'].includes(ad.platform)) {
-    return { isValid: false, error: 'پلتفرم نامعتبر است' }
-  }
-
-  return { isValid: true, error: null }
-}
-
-  // مقداردهی اولیه
-  loadAds()
 
   return {
     ads,
-    placements,
+    settings,
+    loading,
+    error,
     stats,
+    placements,
     placementTypes,
     platforms,
     adTypes,
@@ -236,12 +219,12 @@ const validateAd = (ad) => {
     updateAd,
     deleteAd,
     getAdById,
+    updateSetting,
     toggleAdPlacement,
     isAdEnabledForPlacement,
     getAdsForPlacement,
     validateAd,
     loadAds,
-    saveAds,
-    savePlacements
+    loadSettings
   }
 })

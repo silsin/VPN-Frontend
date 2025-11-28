@@ -103,6 +103,11 @@ const props = defineProps({
   editingConfig: {
     type: Object,
     default: null
+  },
+  category: {
+    type: String,
+    default: 'main',
+    validator: (value) => ['main', 'splash', 'backup'].includes(value)
   }
 })
 
@@ -112,7 +117,8 @@ const configStore = useConfigStore()
 const formData = ref({
   name: '',
   type: 'link',
-  content: ''
+  content: '',
+  category: props.category
 })
 const validationError = ref('')
 const isSubmitting = ref(false)
@@ -126,14 +132,16 @@ watch(() => props.isOpen, (isOpen) => {
       formData.value = {
         name: props.editingConfig.name,
         type: props.editingConfig.type,
-        content: props.editingConfig.content
+        content: props.editingConfig.content,
+        category: props.editingConfig.category || props.category
       }
     } else {
       // حالت افزودن جدید
       formData.value = {
         name: '',
         type: 'link',
-        content: ''
+        content: '',
+        category: props.category
       }
     }
     validationError.value = ''
@@ -183,7 +191,8 @@ const handleSubmit = async () => {
     const configData = {
       name: formData.value.name.trim(),
       type: formData.value.type,
-      content: formData.value.content.trim()
+      content: formData.value.content.trim(),
+      category: formData.value.category
     }
 
     if (isEditing.value) {

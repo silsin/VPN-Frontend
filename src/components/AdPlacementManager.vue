@@ -11,15 +11,15 @@
         <h4>🏠 صفحه اسپلش - بنر</h4>
         <div class="placement-ads">
           <div
-            v-for="ad in getAdsForPlacement('splash_banner')"
+            v-for="ad in getAdsForPlacement('splash')"
             :key="ad.id"
             class="ad-placement-card"
-            :class="{ active: isAdEnabledForPlacement(ad.id, 'splash_banner') }"
+            :class="{ active: isAdEnabledForPlacement(ad.id, 'splash') }"
           >
             <div class="ad-placement-info">
               <div class="ad-placement-name">{{ ad.name }}</div>
               <div class="ad-placement-type">
-                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : 'ویدیو' }}</span>
+                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}</span>
               </div>
             </div>
             <div class="ad-placement-toggle">
@@ -27,14 +27,14 @@
                 <input
                   type="checkbox"
                   :id="'splash-' + ad.id"
-                  :checked="isAdEnabledForPlacement(ad.id, 'splash_banner')"
-                  @change="toggleAdForPlacement(ad.id, 'splash_banner')"
+                  :checked="isAdEnabledForPlacement(ad.id, 'splash')"
+                  @change="toggleAdForPlacement(ad.id, 'splash')"
                 />
                 <label :for="'splash-' + ad.id" class="toggle-slider"></label>
               </div>
             </div>
           </div>
-          <div v-if="getAdsForPlacement('splash_banner').length === 0" class="no-ads-message">
+          <div v-if="getAdsForPlacement('splash').length === 0" class="no-ads-message">
             هیچ تبلیغی برای این جایگاه تعریف نشده است
           </div>
         </div>
@@ -44,15 +44,15 @@
         <h4>📱 صفحه اصلی - بنر</h4>
         <div class="placement-ads">
           <div
-            v-for="ad in getAdsForPlacement('home_banner')"
+            v-for="ad in getAdsForPlacement('main_page')"
             :key="ad.id"
             class="ad-placement-card"
-            :class="{ active: isAdEnabledForPlacement(ad.id, 'home_banner') }"
+            :class="{ active: isAdEnabledForPlacement(ad.id, 'main_page') }"
           >
             <div class="ad-placement-info">
               <div class="ad-placement-name">{{ ad.name }}</div>
               <div class="ad-placement-type">
-                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : 'ویدیو' }}</span>
+                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}</span>
               </div>
             </div>
             <div class="ad-placement-toggle">
@@ -60,14 +60,14 @@
                 <input
                   type="checkbox"
                   :id="'home-' + ad.id"
-                  :checked="isAdEnabledForPlacement(ad.id, 'home_banner')"
-                  @change="toggleAdForPlacement(ad.id, 'home_banner')"
+                  :checked="isAdEnabledForPlacement(ad.id, 'main_page')"
+                  @change="toggleAdForPlacement(ad.id, 'main_page')"
                 />
                 <label :for="'home-' + ad.id" class="toggle-slider"></label>
               </div>
             </div>
           </div>
-          <div v-if="getAdsForPlacement('home_banner').length === 0" class="no-ads-message">
+          <div v-if="getAdsForPlacement('main_page').length === 0" class="no-ads-message">
             هیچ تبلیغی برای این جایگاه تعریف نشده است
           </div>
         </div>
@@ -77,15 +77,15 @@
         <h4>🎬 تبلیغات ویدیویی</h4>
         <div class="placement-ads">
           <div
-            v-for="ad in getAdsForPlacement('video_ads')"
+            v-for="ad in getAdsForPlacement('video_ad')"
             :key="ad.id"
             class="ad-placement-card"
-            :class="{ active: isAdEnabledForPlacement(ad.id, 'video_ads') }"
+            :class="{ active: isAdEnabledForPlacement(ad.id, 'video_ad') }"
           >
             <div class="ad-placement-info">
               <div class="ad-placement-name">{{ ad.name }}</div>
               <div class="ad-placement-type">
-                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : 'ویدیو' }}</span>
+                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}</span>
               </div>
             </div>
             <div class="ad-placement-toggle">
@@ -93,14 +93,14 @@
                 <input
                   type="checkbox"
                   :id="'video-' + ad.id"
-                  :checked="isAdEnabledForPlacement(ad.id, 'video_ads')"
-                  @change="toggleAdForPlacement(ad.id, 'video_ads')"
+                  :checked="isAdEnabledForPlacement(ad.id, 'video_ad')"
+                  @change="toggleAdForPlacement(ad.id, 'video_ad')"
                 />
                 <label :for="'video-' + ad.id" class="toggle-slider"></label>
               </div>
             </div>
           </div>
-          <div v-if="getAdsForPlacement('video_ads').length === 0" class="no-ads-message">
+          <div v-if="getAdsForPlacement('video_ad').length === 0" class="no-ads-message">
             هیچ تبلیغی برای این جایگاه تعریف نشده است
           </div>
         </div>
@@ -110,15 +110,15 @@
         <h4>🎁 ویدیو جایزه‌ای</h4>
         <div class="placement-ads">
           <div
-            v-for="ad in getAdsForPlacement('rewarded_video')"
+            v-for="ad in getAdsForPlacement('reward_video')"
             :key="ad.id"
             class="ad-placement-card"
-            :class="{ active: isAdEnabledForPlacement(ad.id, 'rewarded_video') }"
+            :class="{ active: isAdEnabledForPlacement(ad.id, 'reward_video') }"
           >
             <div class="ad-placement-info">
               <div class="ad-placement-name">{{ ad.name }}</div>
               <div class="ad-placement-type">
-                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : 'ویدیو' }}</span>
+                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}</span>
               </div>
             </div>
             <div class="ad-placement-toggle">
@@ -126,14 +126,14 @@
                 <input
                   type="checkbox"
                   :id="'rewarded-' + ad.id"
-                  :checked="isAdEnabledForPlacement(ad.id, 'rewarded_video')"
-                  @change="toggleAdForPlacement(ad.id, 'rewarded_video')"
+                  :checked="isAdEnabledForPlacement(ad.id, 'reward_video')"
+                  @change="toggleAdForPlacement(ad.id, 'reward_video')"
                 />
                 <label :for="'rewarded-' + ad.id" class="toggle-slider"></label>
               </div>
             </div>
           </div>
-          <div v-if="getAdsForPlacement('rewarded_video').length === 0" class="no-ads-message">
+          <div v-if="getAdsForPlacement('reward_video').length === 0" class="no-ads-message">
             هیچ تبلیغی برای این جایگاه تعریف نشده است
           </div>
         </div>
@@ -171,9 +171,9 @@
               <!-- بنر اسپلش -->
               <div
                 class="ad-banner"
-                :class="{ 'ad-active': hasActiveAdsForPlacement('splash_banner') }"
+                :class="{ 'ad-active': hasActiveAdsForPlacement('splash') }"
               >
-                <div v-if="hasActiveAdsForPlacement('splash_banner')" class="ad-content">
+                <div v-if="hasActiveAdsForPlacement('splash')" class="ad-content">
                   <div class="ad-label">تبلیغ اسپلش</div>
                   <div class="ad-indicator">📢</div>
                 </div>
@@ -196,9 +196,9 @@
                 <!-- بنر صفحه اصلی -->
                 <div
                   class="ad-banner"
-                  :class="{ 'ad-active': hasActiveAdsForPlacement('home_banner') }"
+                  :class="{ 'ad-active': hasActiveAdsForPlacement('main_page') }"
                 >
-                  <div v-if="hasActiveAdsForPlacement('home_banner')" class="ad-content">
+                  <div v-if="hasActiveAdsForPlacement('main_page')" class="ad-content">
                     <div class="ad-label">تبلیغ صفحه اصلی</div>
                     <div class="ad-indicator">📢</div>
                   </div>
@@ -208,13 +208,13 @@
                 </div>
 
                 <div class="action-buttons">
-                  <button class="action-btn" :class="{ 'with-video': hasActiveAdsForPlacement('video_ads') }">
+                  <button class="action-btn" :class="{ 'with-video': hasActiveAdsForPlacement('video_ad') }">
                     اتصال سریع
-                    <span v-if="hasActiveAdsForPlacement('video_ads')" class="video-indicator">🎥</span>
+                    <span v-if="hasActiveAdsForPlacement('video_ad')" class="video-indicator">🎥</span>
                   </button>
-                  <button class="action-btn" :class="{ 'with-reward': hasActiveAdsForPlacement('rewarded_video') }">
+                  <button class="action-btn" :class="{ 'with-reward': hasActiveAdsForPlacement('reward_video') }">
                     جایزه روزانه
-                    <span v-if="hasActiveAdsForPlacement('rewarded_video')" class="reward-indicator">🎁</span>
+                    <span v-if="hasActiveAdsForPlacement('reward_video')" class="reward-indicator">🎁</span>
                   </button>
                 </div>
               </div>
@@ -246,10 +246,10 @@ const adsStore = useAdsStore()
 const currentTime = ref('')
 
 // Computed properties
-const ads = computed(() => adsStore.ads.filter(ad => ad.status === 'active'))
+const ads = computed(() => adsStore.ads.filter(ad => ad.isActive === true))
 
 const getAdsForPlacement = (placementKey) => {
-  return ads.value.filter(ad => ad.placements && ad.placements.includes(placementKey))
+  return ads.value.filter(ad => ad.placement === placementKey)
 }
 
 const isAdEnabledForPlacement = (adId, placementKey) => {
