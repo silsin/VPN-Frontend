@@ -127,6 +127,20 @@
               <input
                 type="radio"
                 name="placement"
+                value="splash_interstitial"
+                v-model="formData.placement"
+              />
+              <span class="checkmark"></span>
+              <div class="placement-info">
+                <span class="placement-icon">⚡</span>
+                <span class="placement-name">میان‌صفحه‌ای اسپلش</span>
+              </div>
+            </label>
+
+            <label class="placement-radio">
+              <input
+                type="radio"
+                name="placement"
                 value="main_page"
                 v-model="formData.placement"
               />
@@ -162,6 +176,48 @@
               <div class="placement-info">
                 <span class="placement-icon">🎁</span>
                 <span class="placement-name">ویدیو جایزه‌ای</span>
+              </div>
+            </label>
+
+            <label class="placement-radio">
+              <input
+                type="radio"
+                name="placement"
+                value="vpn_connect"
+                v-model="formData.placement"
+              />
+              <span class="checkmark"></span>
+              <div class="placement-info">
+                <span class="placement-icon">🔌</span>
+                <span class="placement-name">اتصال VPN</span>
+              </div>
+            </label>
+
+            <label class="placement-radio">
+              <input
+                type="radio"
+                name="placement"
+                value="vpn_disconnect"
+                v-model="formData.placement"
+              />
+              <span class="checkmark"></span>
+              <div class="placement-info">
+                <span class="placement-icon">❌</span>
+                <span class="placement-name">قطع اتصال VPN</span>
+              </div>
+            </label>
+
+            <label class="placement-radio">
+              <input
+                type="radio"
+                name="placement"
+                value="server_change"
+                v-model="formData.placement"
+              />
+              <span class="checkmark"></span>
+              <div class="placement-info">
+                <span class="placement-icon">🔄</span>
+                <span class="placement-name">تغییر سرور</span>
               </div>
             </label>
           </div>

@@ -41,6 +41,39 @@
       </div>
 
       <div class="placement-section">
+        <h4>⚡ صفحه اسپلش - میان‌صفحه‌ای</h4>
+        <div class="placement-ads">
+          <div
+            v-for="ad in getAdsForPlacement('splash_interstitial')"
+            :key="ad.id"
+            class="ad-placement-card"
+            :class="{ active: isAdEnabledForPlacement(ad.id, 'splash_interstitial') }"
+          >
+            <div class="ad-placement-info">
+              <div class="ad-placement-name">{{ ad.name }}</div>
+              <div class="ad-placement-type">
+                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}</span>
+              </div>
+            </div>
+            <div class="ad-placement-toggle">
+              <div class="toggle-switch">
+                <input
+                  type="checkbox"
+                  :id="'splash-interstitial-' + ad.id"
+                  :checked="isAdEnabledForPlacement(ad.id, 'splash_interstitial')"
+                  @change="toggleAdForPlacement(ad.id, 'splash_interstitial')"
+                />
+                <label :for="'splash-interstitial-' + ad.id" class="toggle-slider"></label>
+              </div>
+            </div>
+          </div>
+          <div v-if="getAdsForPlacement('splash_interstitial').length === 0" class="no-ads-message">
+            هیچ تبلیغی برای این جایگاه تعریف نشده است
+          </div>
+        </div>
+      </div>
+
+      <div class="placement-section">
         <h4>📱 صفحه اصلی - بنر</h4>
         <div class="placement-ads">
           <div
@@ -138,6 +171,105 @@
           </div>
         </div>
       </div>
+
+      <div class="placement-section">
+        <h4>🔌 اتصال VPN</h4>
+        <div class="placement-ads">
+          <div
+            v-for="ad in getAdsForPlacement('vpn_connect')"
+            :key="ad.id"
+            class="ad-placement-card"
+            :class="{ active: isAdEnabledForPlacement(ad.id, 'vpn_connect') }"
+          >
+            <div class="ad-placement-info">
+              <div class="ad-placement-name">{{ ad.name }}</div>
+              <div class="ad-placement-type">
+                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}</span>
+              </div>
+            </div>
+            <div class="ad-placement-toggle">
+              <div class="toggle-switch">
+                <input
+                  type="checkbox"
+                  :id="'vpn-connect-' + ad.id"
+                  :checked="isAdEnabledForPlacement(ad.id, 'vpn_connect')"
+                  @change="toggleAdForPlacement(ad.id, 'vpn_connect')"
+                />
+                <label :for="'vpn-connect-' + ad.id" class="toggle-slider"></label>
+              </div>
+            </div>
+          </div>
+          <div v-if="getAdsForPlacement('vpn_connect').length === 0" class="no-ads-message">
+            هیچ تبلیغی برای این جایگاه تعریف نشده است
+          </div>
+        </div>
+      </div>
+
+      <div class="placement-section">
+        <h4>❌ قطع اتصال VPN</h4>
+        <div class="placement-ads">
+          <div
+            v-for="ad in getAdsForPlacement('vpn_disconnect')"
+            :key="ad.id"
+            class="ad-placement-card"
+            :class="{ active: isAdEnabledForPlacement(ad.id, 'vpn_disconnect') }"
+          >
+            <div class="ad-placement-info">
+              <div class="ad-placement-name">{{ ad.name }}</div>
+              <div class="ad-placement-type">
+                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}</span>
+              </div>
+            </div>
+            <div class="ad-placement-toggle">
+              <div class="toggle-switch">
+                <input
+                  type="checkbox"
+                  :id="'vpn-disconnect-' + ad.id"
+                  :checked="isAdEnabledForPlacement(ad.id, 'vpn_disconnect')"
+                  @change="toggleAdForPlacement(ad.id, 'vpn_disconnect')"
+                />
+                <label :for="'vpn-disconnect-' + ad.id" class="toggle-slider"></label>
+              </div>
+            </div>
+          </div>
+          <div v-if="getAdsForPlacement('vpn_disconnect').length === 0" class="no-ads-message">
+            هیچ تبلیغی برای این جایگاه تعریف نشده است
+          </div>
+        </div>
+      </div>
+
+      <div class="placement-section">
+        <h4>🔄 تغییر سرور</h4>
+        <div class="placement-ads">
+          <div
+            v-for="ad in getAdsForPlacement('server_change')"
+            :key="ad.id"
+            class="ad-placement-card"
+            :class="{ active: isAdEnabledForPlacement(ad.id, 'server_change') }"
+          >
+            <div class="ad-placement-info">
+              <div class="ad-placement-name">{{ ad.name }}</div>
+              <div class="ad-placement-type">
+                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}</span>
+              </div>
+            </div>
+            <div class="ad-placement-toggle">
+              <div class="toggle-switch">
+                <input
+                  type="checkbox"
+                  :id="'server-change-' + ad.id"
+                  :checked="isAdEnabledForPlacement(ad.id, 'server_change')"
+                  @change="toggleAdForPlacement(ad.id, 'server_change')"
+                />
+                <label :for="'server-change-' + ad.id" class="toggle-slider"></label>
+              </div>
+            </div>
+          </div>
+          <div v-if="getAdsForPlacement('server_change').length === 0" class="no-ads-message">
+            هیچ تبلیغی برای این جایگاه تعریف نشده است
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- پیش‌نمایش موبایل -->
@@ -166,6 +298,18 @@
               <div class="app-logo">
                 <div class="logo-icon">🚀</div>
                 <div class="logo-text">FlyVPN</div>
+              </div>
+
+              <!-- تبلیغ میان‌صفحه‌ای اسپلش -->
+              <div
+                v-if="hasActiveAdsForPlacement('splash_interstitial')"
+                class="interstitial-overlay"
+              >
+                <div class="interstitial-content">
+                  <div class="interstitial-icon">⚡</div>
+                  <div class="interstitial-text">تبلیغ میان‌صفحه‌ای</div>
+                  <div class="interstitial-sub">در حال انتقال به خانه...</div>
+                </div>
               </div>
 
               <!-- بنر اسپلش -->
@@ -742,5 +886,57 @@ input:checked + .toggle-slider:before {
   .control-group {
     padding: 20px;
   }
+}
+</style>
+
+<style scoped>
+.interstitial-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease;
+}
+
+.interstitial-content {
+  text-align: center;
+  color: white;
+}
+
+.interstitial-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  animation: bounce 2s infinite;
+}
+
+.interstitial-text {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: "Vazirmatn", sans-serif;
+  margin-bottom: 8px;
+}
+
+.interstitial-sub {
+  font-size: 12px;
+  opacity: 0.7;
+  font-family: "Vazirmatn", sans-serif;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+  40% {transform: translateY(-20px);}
+  60% {transform: translateY(-10px);}
 }
 </style>

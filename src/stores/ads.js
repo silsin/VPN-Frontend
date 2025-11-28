@@ -125,9 +125,13 @@ export const useAdsStore = defineStore('ads', () => {
   // Placement types
   const placementTypes = [
     { key: 'splash', label: 'بنر اسپلش', icon: '📱' },
+    { key: 'splash_interstitial', label: 'میان‌صفحه‌ای اسپلش', icon: '⚡' },
     { key: 'main_page', label: 'بنر صفحه اصلی', icon: '🏠' },
     { key: 'video_ad', label: 'تبلیغات ویدیویی', icon: '🎬' },
-    { key: 'reward_video', label: 'ویدیو جایزه‌ای', icon: '🎁' }
+    { key: 'reward_video', label: 'ویدیو جایزه‌ای', icon: '🎁' },
+    { key: 'vpn_connect', label: 'اتصال VPN', icon: '🔌' },
+    { key: 'vpn_disconnect', label: 'قطع اتصال VPN', icon: '❌' },
+    { key: 'server_change', label: 'تغییر سرور', icon: '🔄' }
   ]
 
   // Platforms
@@ -173,9 +177,13 @@ export const useAdsStore = defineStore('ads', () => {
   const placements = computed(() => {
     const result = {
       splash: [],
+      splash_interstitial: [],
       main_page: [],
       video_ad: [],
-      reward_video: []
+      reward_video: [],
+      vpn_connect: [],
+      vpn_disconnect: [],
+      server_change: []
     }
     
     ads.value.forEach(ad => {
