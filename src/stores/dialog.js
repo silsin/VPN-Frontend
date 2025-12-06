@@ -1,215 +1,25 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-
-// نمونه داده‌های اولیه برای دیالوگ‌ها و اعلان‌ها
-const initialDialogs = [
-  {
-    id: '1',
-    title: 'به‌روزرسانی مهم اپلیکیشن',
-    message: 'نسخه جدید FlyVPN با امکانات بیشتر منتشر شد. همین حالا بروزرسانی کنید!',
-    type: 'dialog', // 'dialog' or 'push'
-    dialogType: 'info', // 'info', 'warning', 'success', 'error'
-    target: 'all', // 'all', 'android', 'ios', 'specific_users'
-    status: 'sent', // 'draft', 'scheduled', 'sent', 'cancelled'
-    priority: 'normal', // 'low', 'normal', 'high', 'urgent'
-    scheduleTime: null,
-    sentTime: new Date().toISOString(),
-    imageUrl: null,
-    actionButtons: [
-      { text: 'بروزرسانی', action: 'update_app' },
-      { text: 'بعداً', action: 'dismiss' }
-    ],
-    clickAction: 'open_update_page',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '2',
-    title: 'پیشنهاد ویژه!',
-    message: 'با خرید اشتراک طلایی ۵۰٪ تخفیف بگیرید. پیشنهاد محدود است!',
-    type: 'push',
-    target: 'all',
-    status: 'scheduled',
-    priority: 'high',
-    scheduleTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // tomorrow
-    sentTime: null,
-    imageUrl: 'https://example.com/promo-image.jpg',
-    actionButtons: [],
-    clickAction: 'open_premium_page',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '3',
-    title: 'خوش آمدید!',
-    message: 'از نصب FlyVPN سپاسگزاریم. از امکانات رایگان استفاده کنید.',
-    type: 'dialog',
-    dialogType: 'success',
-    target: 'all',
-    status: 'draft',
-    priority: 'normal',
-    scheduleTime: null,
-    sentTime: null,
-    imageUrl: null,
-    actionButtons: [
-      { text: 'شروع کنید', action: 'open_main' }
-    ],
-    clickAction: 'none',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-]
+import api from '../services/api'
 
 export const useDialogStore = defineStore('dialog', () => {
   const dialogs = ref([])
+  const loading = ref(false)
+  const error = ref(null)
+  
+  // Pagination & Filtering state
+  const pagination = ref({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1
+  })
+  
   const searchQuery = ref('')
   const filterType = ref('all') // 'all', 'dialog', 'push'
   const filterStatus = ref('all') // 'all', 'draft', 'scheduled', 'sent', 'cancelled'
 
-  // بارگذاری داده‌ها از localStorage
-  const loadDialogs = () => {
-    const stored = localStorage.getItem('dialogData')
-    if (stored) {
-      try {
-        dialogs.value = JSON.parse(stored)
-      } catch (e) {
-        console.error('Error loading dialogs:', e)
-        dialogs.value = initialDialogs
-      }
-    } else {
-      dialogs.value = initialDialogs
-      saveDialogs()
-    }
-  }
-
-  // ذخیره داده‌ها در localStorage
-  const saveDialogs = () => {
-    localStorage.setItem('dialogData', JSON.stringify(dialogs.value))
-  }
-
-  // افزودن دیالوگ/اعلان جدید
-  const addDialog = (dialog) => {
-    const newDialog = {
-      id: Date.now().toString(),
-      ...dialog,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-    dialogs.value.push(newDialog)
-    saveDialogs()
-    return newDialog
-  }
-
-  // بروزرسانی دیالوگ/اعلان
-  const updateDialog = (id, updatedDialog) => {
-    const index = dialogs.value.findIndex(dialog => dialog.id === id)
-    if (index !== -1) {
-      dialogs.value[index] = {
-        ...dialogs.value[index],
-        ...updatedDialog,
-        updatedAt: new Date().toISOString()
-      }
-      saveDialogs()
-      return dialogs.value[index]
-    }
-    return null
-  }
-
-  // حذف دیالوگ/اعلان
-  const deleteDialog = (id) => {
-    const index = dialogs.value.findIndex(dialog => dialog.id === id)
-    if (index !== -1) {
-      dialogs.value.splice(index, 1)
-      saveDialogs()
-      return true
-    }
-    return false
-  }
-
-  // گرفتن دیالوگ/اعلان بر اساس ID
-  const getDialogById = (id) => {
-    return dialogs.value.find(dialog => dialog.id === id)
-  }
-
-  // ارسال دیالوگ/اعلان
-  const sendDialog = (id) => {
-    const dialog = getDialogById(id)
-    if (dialog) {
-      updateDialog(id, {
-        status: 'sent',
-        sentTime: new Date().toISOString()
-      })
-      return true
-    }
-    return false
-  }
-
-  // لغو برنامه‌ریزی شده
-  const cancelScheduledDialog = (id) => {
-    const dialog = getDialogById(id)
-    if (dialog && dialog.status === 'scheduled') {
-      updateDialog(id, {
-        status: 'cancelled',
-        scheduleTime: null
-      })
-      return true
-    }
-    return false
-  }
-
-  // تنظیم فیلترها
-  const setSearchQuery = (query) => {
-    searchQuery.value = query
-  }
-
-  const setFilterType = (type) => {
-    filterType.value = type
-  }
-
-  const setFilterStatus = (status) => {
-    filterStatus.value = status
-  }
-
-  // دیالوگ‌های فیلتر شده
-  const filteredDialogs = computed(() => {
-    let filtered = dialogs.value
-
-    // فیلتر بر اساس نوع
-    if (filterType.value !== 'all') {
-      filtered = filtered.filter(dialog => dialog.type === filterType.value)
-    }
-
-    // فیلتر بر اساس وضعیت
-    if (filterStatus.value !== 'all') {
-      filtered = filtered.filter(dialog => dialog.status === filterStatus.value)
-    }
-
-    // فیلتر بر اساس جستجو
-    if (searchQuery.value.trim()) {
-      const query = searchQuery.value.toLowerCase()
-      filtered = filtered.filter(dialog =>
-        dialog.title.toLowerCase().includes(query) ||
-        dialog.message.toLowerCase().includes(query)
-      )
-    }
-
-    // مرتب‌سازی بر اساس تاریخ ایجاد (جدیدترین اول)
-    return filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-  })
-
-  // آمار دیالوگ‌ها
-  const stats = computed(() => {
-    return {
-      total: dialogs.value.length,
-      dialogs: dialogs.value.filter(d => d.type === 'dialog').length,
-      pushes: dialogs.value.filter(d => d.type === 'push').length,
-      sent: dialogs.value.filter(d => d.status === 'sent').length,
-      scheduled: dialogs.value.filter(d => d.status === 'scheduled').length,
-      draft: dialogs.value.filter(d => d.status === 'draft').length
-    }
-  })
-
-  // لیست انواع دیالوگ
+  // Constants
   const dialogTypes = [
     { value: 'info', label: 'اطلاع‌رسانی', icon: 'ℹ️', color: '#3b82f6' },
     { value: 'success', label: 'موفقیت', icon: '✅', color: '#10b981' },
@@ -217,7 +27,6 @@ export const useDialogStore = defineStore('dialog', () => {
     { value: 'error', label: 'خطا', icon: '❌', color: '#ef4444' }
   ]
 
-  // لیست اولویت‌ها
   const priorities = [
     { value: 'low', label: 'کم', color: '#6b7280' },
     { value: 'normal', label: 'معمولی', color: '#3b82f6' },
@@ -225,7 +34,6 @@ export const useDialogStore = defineStore('dialog', () => {
     { value: 'urgent', label: 'فوری', color: '#ef4444' }
   ]
 
-  // لیست اهداف
   const targets = [
     { value: 'all', label: 'همه کاربران' },
     { value: 'android', label: 'کاربران Android' },
@@ -233,7 +41,6 @@ export const useDialogStore = defineStore('dialog', () => {
     { value: 'specific_users', label: 'کاربران خاص' }
   ]
 
-  // لیست وضعیت‌ها
   const statuses = [
     { value: 'draft', label: 'پیش‌نویس', color: '#6b7280' },
     { value: 'scheduled', label: 'برنامه‌ریزی شده', color: '#3b82f6' },
@@ -241,7 +48,163 @@ export const useDialogStore = defineStore('dialog', () => {
     { value: 'cancelled', label: 'لغو شده', color: '#ef4444' }
   ]
 
-  // اعتبارسنجی دیالوگ
+  // Fetch Dialogs from API
+  const fetchDialogs = async (page = 1) => {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const params = {
+        page,
+        limit: pagination.value.limit
+      }
+      
+      if (filterType.value !== 'all') {
+        if (filterType.value === 'dialog') params.type = 'in-app'
+        else if (filterType.value === 'push') params.type = 'push'
+      }
+      
+      if (filterStatus.value !== 'all') {
+        params.status = filterStatus.value
+      }
+      
+      if (searchQuery.value.trim()) {
+        params.search = searchQuery.value
+      }
+
+      const response = await api.get('/dialogs', { params })
+      
+      if (Array.isArray(response.data)) {
+         dialogs.value = response.data
+      } else {
+         const { data, total, totalPages } = response.data
+         dialogs.value = data || response.data.items || []
+         pagination.value.total = total || response.data.total || 0
+         pagination.value.page = page
+         pagination.value.totalPages = totalPages || Math.ceil(pagination.value.total / pagination.value.limit)
+      }
+
+    } catch (err) {
+      console.error('Error fetching dialogs:', err)
+      error.value = err.response?.data?.message || 'خطا در دریافت لیست دیالوگ‌ها'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Add new Dialog
+  const addDialog = async (dialogData) => {
+    loading.value = true
+    error.value = null
+    try {
+      const payload = {
+        ...dialogData,
+        type: dialogData.type === 'dialog' ? 'in-app' : dialogData.type
+      }
+      
+      await api.post('/dialogs', payload)
+      await fetchDialogs(1)
+      return { success: true }
+    } catch (err) {
+      console.error('Error adding dialog:', err)
+      return { success: false, error: err.response?.data?.message || 'خطا در ایجاد دیالوگ' }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Update Dialog
+  const updateDialog = async (id, dialogData) => {
+    loading.value = true
+    try {
+      await api.put(`/dialogs/${id}`, dialogData)
+      await fetchDialogs(pagination.value.page)
+      return { success: true }
+    } catch (err) {
+      console.error('Error updating dialog:', err)
+      return { success: false, error: err.response?.data?.message || 'خطا در ویرایش دیالوگ' }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Delete Dialog
+  const deleteDialog = async (id) => {
+    loading.value = true
+    try {
+      await api.delete(`/dialogs/${id}`)
+      await fetchDialogs(pagination.value.page)
+      return { success: true }
+    } catch (err) {
+      console.error('Error deleting dialog:', err)
+      return { success: false, error: err.response?.data?.message || 'خطا در حذف دیالوگ' }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Send Immediately
+  const sendDialog = async (id) => {
+    loading.value = true
+    try {
+      await api.post(`/dialogs/${id}/send`)
+      await fetchDialogs(pagination.value.page)
+      return { success: true }
+    } catch (err) {
+      console.error('Error sending dialog:', err)
+      return { success: false, error: err.response?.data?.message || 'خطا در ارسال دیالوگ' }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Cancel Scheduled
+  const cancelScheduledDialog = async (id) => {
+    loading.value = true
+    try {
+      await api.post(`/dialogs/${id}/cancel`)
+      await fetchDialogs(pagination.value.page)
+      return { success: true }
+    } catch (err) {
+      console.error('Error cancelling dialog:', err)
+      return { success: false, error: err.response?.data?.message || 'خطا در لغو دیالوگ' }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Get Analytics
+  const getAnalytics = async (id) => {
+    try {
+      const response = await api.get(`/dialogs/${id}/analytics`)
+      return response.data
+    } catch (err) {
+      console.error('Error fetching analytics:', err)
+      return null
+    }
+  }
+
+  // Setters for filters
+  const setSearchQuery = (query) => {
+    searchQuery.value = query
+    fetchDialogs(1)
+  }
+
+  const setFilterType = (type) => {
+    filterType.value = type
+    fetchDialogs(1)
+  }
+
+  const setFilterStatus = (status) => {
+    filterStatus.value = status
+    fetchDialogs(1)
+  }
+  
+  const setPage = (page) => {
+    fetchDialogs(page)
+  }
+
+  // Validation
   const validateDialog = (dialog) => {
     if (!dialog.title || !dialog.title.trim()) {
       return { isValid: false, error: 'عنوان نمی‌تواند خالی باشد' }
@@ -270,11 +233,26 @@ export const useDialogStore = defineStore('dialog', () => {
     return { isValid: true, error: null }
   }
 
-  // مقداردهی اولیه
-  loadDialogs()
+  // Computed properties
+  const filteredDialogs = computed(() => dialogs.value)
+  
+  const stats = computed(() => {
+    const dialogsList = dialogs.value || []
+    return {
+      total: pagination.value.total,
+      dialogs: dialogsList.filter(d => d.type === 'in-app').length,
+      pushes: dialogsList.filter(d => d.type === 'push').length,
+      sent: dialogsList.filter(d => d.status === 'sent').length,
+      scheduled: dialogsList.filter(d => d.status === 'scheduled').length,
+      draft: dialogsList.filter(d => d.status === 'draft').length
+    }
+  })
 
   return {
     dialogs,
+    loading,
+    error,
+    pagination,
     searchQuery,
     filterType,
     filterStatus,
@@ -284,17 +262,17 @@ export const useDialogStore = defineStore('dialog', () => {
     priorities,
     targets,
     statuses,
+    fetchDialogs,
     addDialog,
     updateDialog,
     deleteDialog,
-    getDialogById,
     sendDialog,
     cancelScheduledDialog,
+    getAnalytics,
     setSearchQuery,
     setFilterType,
     setFilterStatus,
-    validateDialog,
-    loadDialogs,
-    saveDialogs
+    setPage,
+    validateDialog
   }
 })

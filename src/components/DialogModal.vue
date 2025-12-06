@@ -76,35 +76,47 @@
           </div>
         </div>
 
-        <!-- دکمه‌های عملی (فقط برای دیالوگ) -->
+        <!-- دکمه‌های دیالوگ (فقط برای دیالوگ) -->
         <div class="form-group" v-if="formData.type === 'dialog'">
-          <label>دکمه‌های عملی</label>
+          <label>دکمه‌های دیالوگ</label>
           <div class="action-buttons-config">
             <div
-              v-for="(button, index) in formData.actionButtons"
+              v-for="(button, index) in formData.buttons"
               :key="index"
               class="action-button-item"
             >
               <input
                 type="text"
-                v-model="button.text"
-                placeholder="متن دکمه"
+                v-model="button.label"
+                placeholder="متن دکمه (مثلاً دانلود، بستن)"
+                required
+                class="action-btn-input"
+              />
+              <input
+                type="url"
+                v-model="button.actionUrl"
+                placeholder="لینک (اختیاری)"
+                class="action-btn-input"
+              />
+              <input
+                type="text"
+                v-model="button.action"
+                placeholder="اکشن (مثلاً dismiss)"
                 class="action-btn-input"
               />
               <select
-                v-model="button.action"
+                v-model="button.style"
                 class="action-select"
               >
-                <option value="dismiss">بستن</option>
-                <option value="open_update_page">صفحه بروزرسانی</option>
-                <option value="open_premium_page">صفحه پریمیوم</option>
-                <option value="open_main">صفحه اصلی</option>
-                <option value="custom">سفارشی</option>
+                <option value="primary">اصلی</option>
+                <option value="secondary">ثانویه</option>
+                <option value="danger">خطر</option>
+                <option value="success">موفقیت</option>
               </select>
               <button
                 type="button"
                 class="remove-btn"
-                @click="removeActionButton(index)"
+                @click="removeButton(index)"
               >
                 ✕
               </button>
@@ -112,10 +124,12 @@
             <button
               type="button"
               class="add-action-btn"
-              @click="addActionButton"
+              @click="addButton"
+              :disabled="formData.buttons.length >= 3"
             >
-              + افزودن دکمه عملی
+              + افزودن دکمه
             </button>
+            <small class="form-hint">حداکثر 3 دکمه توصیه می‌شود. حداقل یکی از لینک یا اکشن باید مقداردهی شود.</small>
           </div>
         </div>
 
@@ -215,11 +229,12 @@
                   <p>{{ formData.message || 'متن پیام دیالوگ...' }}</p>
                   <div class="dialog-actions">
                     <button
-                      v-for="button in formData.actionButtons"
-                      :key="button.text"
+                      v-for="(button, index) in formData.buttons"
+                      :key="index"
                       class="preview-btn"
+                      :class="button.style || 'primary'"
                     >
-                      {{ button.text || 'دکمه' }}
+                      {{ button.label || 'دکمه' }}
                     </button>
                   </div>
                 </div>
@@ -289,7 +304,7 @@ const formData = ref({
   priority: 'normal',
   scheduleTime: null,
   imageUrl: '',
-  actionButtons: [{ text: 'باشه', action: 'dismiss' }]
+  buttons: [{ label: 'متوجه شدم', action: 'dismiss', style: 'primary' }]
 })
 const scheduleType = ref('now')
 const validationError = ref('')
@@ -315,7 +330,7 @@ watch(() => props.isOpen, (isOpen) => {
         priority: props.editingDialog.priority || 'normal',
         scheduleTime: props.editingDialog.scheduleTime || null,
         imageUrl: props.editingDialog.imageUrl || '',
-        actionButtons: props.editingDialog.actionButtons || [{ text: 'باشه', action: 'dismiss' }]
+        buttons: props.editingDialog.buttons || [{ label: 'متوجه شدم', action: 'dismiss', style: 'primary' }]
       }
       scheduleType.value = props.editingDialog.scheduleTime ? 'schedule' : 'now'
     } else {
@@ -329,7 +344,7 @@ watch(() => props.isOpen, (isOpen) => {
         priority: 'normal',
         scheduleTime: null,
         imageUrl: '',
-        actionButtons: [{ text: 'باشه', action: 'dismiss' }]
+        buttons: [{ label: 'متوجه شدم', action: 'dismiss', style: 'primary' }]
       }
       scheduleType.value = 'now'
     }
@@ -340,21 +355,21 @@ watch(() => props.isOpen, (isOpen) => {
 const setType = (type) => {
   formData.value.type = type
   if (type === 'push') {
-    formData.value.actionButtons = []
-  } else if (formData.value.actionButtons.length === 0) {
-    formData.value.actionButtons = [{ text: 'باشه', action: 'dismiss' }]
+    formData.value.buttons = []
+  } else if (formData.value.buttons.length === 0) {
+    formData.value.buttons = [{ label: 'متوجه شدم', action: 'dismiss', style: 'primary' }]
   }
 }
 
-const addActionButton = () => {
-  if (formData.value.actionButtons.length < 3) {
-    formData.value.actionButtons.push({ text: '', action: 'dismiss' })
+const addButton = () => {
+  if (formData.value.buttons.length < 3) {
+    formData.value.buttons.push({ label: '', actionUrl: '', action: '', style: 'primary' })
   }
 }
 
-const removeActionButton = (index) => {
-  if (formData.value.actionButtons.length > 1) {
-    formData.value.actionButtons.splice(index, 1)
+const removeButton = (index) => {
+  if (formData.value.buttons.length > 1) {
+    formData.value.buttons.splice(index, 1)
   }
 }
 
@@ -416,23 +431,75 @@ const handleSubmit = async () => {
   isSubmitting.value = true
 
   try {
+    // Build payload matching backend DTO (CreateDialogDto/UpdateDialogDto)
+    const isDialogType = formData.value.type === 'dialog'
+    
     const dialogData = {
-      ...formData.value,
-      status: scheduleType.value === 'now' ? 'sent' : 'scheduled',
-      sentTime: scheduleType.value === 'now' ? new Date().toISOString() : null
+      title: formData.value.title.trim(),
+      message: formData.value.message.trim(),
+      type: isDialogType ? 'in-app' : formData.value.type,
+      target: formData.value.target
     }
 
-    if (isEditing.value) {
-      dialogStore.updateDialog(props.editingDialog.id, dialogData)
+    // Only add imageUrl if it's a valid URL
+    if (formData.value.imageUrl && formData.value.imageUrl.trim()) {
+      const imageUrl = formData.value.imageUrl.trim()
+      // Basic URL validation
+      if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+        dialogData.imageUrl = imageUrl
+      }
+    }
+
+    // Add buttons array if dialog type (not push)
+    if (isDialogType && formData.value.buttons && formData.value.buttons.length > 0) {
+      const validButtons = formData.value.buttons
+        .filter(btn => btn.label && btn.label.trim())
+        .map(btn => {
+          const buttonData = {
+            label: btn.label.trim()
+          }
+          
+          // Add optional fields only if they have values
+          if (btn.actionUrl && btn.actionUrl.trim()) {
+            buttonData.actionUrl = btn.actionUrl.trim()
+          }
+          if (btn.action && btn.action.trim()) {
+            buttonData.action = btn.action.trim()
+          }
+          if (btn.style) {
+            buttonData.style = btn.style
+          }
+          
+          return buttonData
+        })
+      
+      // Only add buttons if there are valid ones
+      if (validButtons.length > 0) {
+        dialogData.buttons = validButtons
+      }
+    }
+
+    // Only add scheduleTime if scheduling
+    if (scheduleType.value === 'schedule' && formData.value.scheduleTime) {
+      dialogData.scheduleTime = new Date(formData.value.scheduleTime).toISOString()
+    }
+
+    // Debug: Log the payload being sent
+    console.log('📤 Sending dialog data:', JSON.stringify(dialogData, null, 2))
+
+    const result = isEditing.value
+      ? await dialogStore.updateDialog(props.editingDialog.id, dialogData)
+      : await dialogStore.addDialog(dialogData)
+
+    if (result.success) {
+      emit('save')
+      closeModal()
     } else {
-      dialogStore.addDialog(dialogData)
+      validationError.value = result.error || 'خطایی در ذخیره دیالوگ رخ داد'
     }
-
-    emit('save')
-    closeModal()
   } catch (error) {
     console.error('Error saving dialog:', error)
-    validationError.value = 'خطایی در ذخیره دیالوگ رخ داد'
+    validationError.value = error.response?.data?.message?.join(', ') || 'خطایی در ذخیره دیالوگ رخ داد'
   } finally {
     isSubmitting.value = false
   }
@@ -734,6 +801,30 @@ const closeModal = () => {
   font-size: 12px;
   font-weight: 600;
   cursor: default;
+}
+
+.preview-btn.primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea;
+  color: white;
+}
+
+.preview-btn.secondary {
+  background: rgba(148, 163, 184, 0.1);
+  border-color: rgba(148, 163, 184, 0.3);
+  color: #64748b;
+}
+
+.preview-btn.danger {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+}
+
+.preview-btn.success {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #16a34a;
 }
 
 .push-preview .push-notification {

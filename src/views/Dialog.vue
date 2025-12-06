@@ -169,7 +169,7 @@ const handleSave = () => {
 
 // بارگذاری داده‌ها در زمان mount
 onMounted(() => {
-  dialogStore.loadDialogs()
+  dialogStore.fetchDialogs()
 })
 </script>
 
