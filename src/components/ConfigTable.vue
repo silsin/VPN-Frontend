@@ -16,6 +16,7 @@
         <thead>
           <tr>
             <th>نام کانفیگ</th>
+            <th>پرچم</th>
             <th>نوع</th>
             <th>محتوا</th>
             <th>تاریخ ایجاد</th>
@@ -25,6 +26,10 @@
         <tbody>
           <tr v-for="config in configs" :key="config.id">
             <td class="config-name">{{ config.name }}</td>
+            <td class="config-flag">
+              <span v-if="config.country" :class="`fi fi-${config.country}`"></span>
+              <span v-else>-</span>
+            </td>
             <td>
               <span
                 class="config-type"
@@ -207,6 +212,12 @@ const confirmDelete = (config) => {
 .config-name {
   font-weight: 600;
   color: #2d3748;
+}
+
+.config-flag span {
+  font-size: 20px;
+  border-radius: 4px;
+  display: block; /* Ensure it stays neat */
 }
 
 .config-type {

@@ -160,6 +160,23 @@
               description="اعلان‌های مربوط به بروزرسانی اپلیکیشن"
             />
           </template>
+
+          <!-- تنظیمات سرور -->
+          <template v-if="category === 'server'">
+            <SettingToggle
+              id="force-server-selection"
+              label="اجبار به انتخاب خودکار سرور"
+              v-model="settings.forceServerSelection"
+              description="اپلیکیشن به صورت خودکار سرور مناسب را انتخاب می‌کند"
+            />
+
+            <SettingToggle
+              id="enable-server-dialog"
+              label="دیالوگ انتخاب سرور"
+              v-model="settings.enableServerDialog"
+              description="نمایش دیالوگ برای انتخاب سرور هنگام اتصال"
+            />
+          </template>
         </template>
       </SettingsTabs>
     </div>

@@ -26,6 +26,12 @@ const defaultSettings = {
     enableMarketingNotifications: false,
     enableSystemNotifications: true,
     enableUpdateNotifications: true
+  },
+
+  // تنظیمات سرور
+  server: {
+    forceServerSelection: false,
+    enableServerDialog: true
   }
 }
 
@@ -135,6 +141,12 @@ const settingsCategories = [
     name: 'اعلان‌ها',
     icon: '🔔',
     description: 'تنظیمات اعلان‌ها و نوتیفیکیشن'
+  },
+  {
+    id: 'server',
+    name: 'تنظیمات سرور',
+    icon: '🖥️',
+    description: 'مدیریت انتخاب و اتصال به سرورها'
   }
 ]
 

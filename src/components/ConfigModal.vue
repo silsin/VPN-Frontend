@@ -45,6 +45,26 @@
           </div>
         </div>
 
+        <!-- کشور -->
+        <div class="form-group">
+          <label for="config-country">کشور / پرچم</label>
+          <div class="country-select-wrapper">
+            <select
+              id="config-country"
+              v-model="formData.country"
+              class="form-select"
+            >
+              <option value="">بدون پرچم</option>
+              <option v-for="country in countries" :key="country.code" :value="country.code">
+                {{ country.name }}
+              </option>
+            </select>
+            <div class="selected-flag" v-if="formData.country">
+              <span :class="`fi fi-${formData.country}`"></span>
+            </div>
+          </div>
+        </div>
+
         <!-- محتوای کانفیگ -->
         <div class="form-group">
           <label for="config-content">
@@ -113,11 +133,25 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'save'])
 
+const countries = [
+  { code: 'ir', name: 'Iran' },
+  { code: 'de', name: 'Germany' },
+  { code: 'us', name: 'United States' },
+  { code: 'nl', name: 'Netherlands' },
+  { code: 'fr', name: 'France' },
+  { code: 'gb', name: 'United Kingdom' },
+  { code: 'tr', name: 'Turkey' },
+  { code: 'ae', name: 'UAE' },
+  { code: 'ru', name: 'Russia' },
+  { code: 'fi', name: 'Finland' }
+]
+
 const configStore = useConfigStore()
 const formData = ref({
   name: '',
   type: 'link',
   content: '',
+  country: '',
   category: props.category
 })
 const validationError = ref('')
@@ -133,6 +167,7 @@ watch(() => props.isOpen, (isOpen) => {
         name: props.editingConfig.name,
         type: props.editingConfig.type,
         content: props.editingConfig.content,
+        country: props.editingConfig.country || '',
         category: props.editingConfig.category || props.category
       }
     } else {
@@ -141,6 +176,7 @@ watch(() => props.isOpen, (isOpen) => {
         name: '',
         type: 'link',
         content: '',
+        country: '',
         category: props.category
       }
     }
@@ -192,6 +228,7 @@ const handleSubmit = async () => {
       name: formData.value.name.trim(),
       type: formData.value.type,
       content: formData.value.content.trim(),
+      country: formData.value.country,
       category: formData.value.category
     }
 
@@ -306,6 +343,46 @@ const closeModal = () => {
   transition: all 0.3s ease;
   outline: none;
   resize: vertical;
+}
+
+.form-select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: 12px;
+  font-size: 16px;
+  font-family: "Vazirmatn", sans-serif;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  outline: none;
+  cursor: pointer;
+  appearance: none; /* Remove default arrow to style wrapper or keep simple */
+}
+
+.form-select:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.country-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.selected-flag {
+  position: absolute;
+  left: 16px; /* RTL layout consideration? Or keep it simple */
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  pointer-events: none;
+}
+
+/* Adjust select padding if flag is present */
+.country-select-wrapper:has( .selected-flag) select {
+    padding-left: 50px; 
 }
 
 .form-input:focus,
