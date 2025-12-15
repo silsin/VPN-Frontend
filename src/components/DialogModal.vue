@@ -214,6 +214,18 @@
           </div>
         </div>
 
+        <!-- زمان انقضا (اختیاری) -->
+        <div class="form-group">
+          <label for="dialog-expire-time">زمان انقضا (اختیاری)</label>
+          <input
+            id="dialog-expire-time"
+            type="datetime-local"
+            v-model="formData.expireTime"
+            class="form-input"
+          />
+          <small class="form-hint">در صورت تنظیم، دیالوگ/اعلان بعد از این زمان منقضی می‌شود.</small>
+        </div>
+
         <!-- پیش‌نمایش -->
         <div class="form-group">
           <label>پیش‌نمایش</label>
@@ -303,12 +315,21 @@ const formData = ref({
   target: 'all',
   priority: 'normal',
   scheduleTime: null,
+  expireTime: null,
   imageUrl: '',
   buttons: [{ label: 'متوجه شدم', action: 'dismiss', style: 'primary' }]
 })
 const scheduleType = ref('now')
 const validationError = ref('')
 const isSubmitting = ref(false)
+
+const toDateTimeLocalValue = (value) => {
+  if (!value) return null
+  const date = value instanceof Date ? value : new Date(value)
+  if (Number.isNaN(date.getTime())) return null
+  const tzOffsetMs = date.getTimezoneOffset() * 60 * 1000
+  return new Date(date.getTime() - tzOffsetMs).toISOString().slice(0, 16)
+}
 
 const isEditing = computed(() => !!props.editingDialog)
 
@@ -328,7 +349,8 @@ watch(() => props.isOpen, (isOpen) => {
         dialogType: props.editingDialog.dialogType || 'info',
         target: props.editingDialog.target || 'all',
         priority: props.editingDialog.priority || 'normal',
-        scheduleTime: props.editingDialog.scheduleTime || null,
+        scheduleTime: toDateTimeLocalValue(props.editingDialog.scheduleTime) || null,
+        expireTime: toDateTimeLocalValue(props.editingDialog.expireTime || props.editingDialog.expiresAt || props.editingDialog.expireAt) || null,
         imageUrl: props.editingDialog.imageUrl || '',
         buttons: props.editingDialog.buttons || [{ label: 'متوجه شدم', action: 'dismiss', style: 'primary' }]
       }
@@ -343,6 +365,7 @@ watch(() => props.isOpen, (isOpen) => {
         target: 'all',
         priority: 'normal',
         scheduleTime: null,
+        expireTime: null,
         imageUrl: '',
         buttons: [{ label: 'متوجه شدم', action: 'dismiss', style: 'primary' }]
       }
@@ -411,6 +434,23 @@ const validateForm = () => {
     }
   }
 
+  if (formData.value.expireTime) {
+    const expireDate = new Date(formData.value.expireTime)
+    const now = new Date()
+    if (expireDate <= now) {
+      validationError.value = 'زمان انقضا باید در آینده باشد'
+      return false
+    }
+
+    if (scheduleType.value === 'schedule' && formData.value.scheduleTime) {
+      const scheduleDate = new Date(formData.value.scheduleTime)
+      if (expireDate <= scheduleDate) {
+        validationError.value = 'زمان انقضا باید بعد از زمان ارسال باشد'
+        return false
+      }
+    }
+  }
+
   const validation = dialogStore.validateDialog({
     ...formData.value,
     status: 'draft'
@@ -438,7 +478,8 @@ const handleSubmit = async () => {
       title: formData.value.title.trim(),
       message: formData.value.message.trim(),
       type: isDialogType ? 'in-app' : formData.value.type,
-      target: formData.value.target
+      target: formData.value.target,
+      priority: formData.value.priority
     }
 
     // Only add imageUrl if it's a valid URL
@@ -482,6 +523,11 @@ const handleSubmit = async () => {
     // Only add scheduleTime if scheduling
     if (scheduleType.value === 'schedule' && formData.value.scheduleTime) {
       dialogData.scheduleTime = new Date(formData.value.scheduleTime).toISOString()
+    }
+
+    // Only add expireTime if set
+    if (formData.value.expireTime) {
+      dialogData.expireTime = new Date(formData.value.expireTime).toISOString()
     }
 
     // Debug: Log the payload being sent
@@ -535,6 +581,7 @@ const closeModal = () => {
   max-width: 700px;
   width: 100%;
   max-height: 90vh;
+  overflow-x: hidden;
   overflow-y: auto;
 }
 
@@ -674,6 +721,7 @@ const closeModal = () => {
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .action-btn-input {
@@ -934,15 +982,24 @@ const closeModal = () => {
 }
 
 @media (max-width: 768px) {
+  .modal-overlay {
+    padding: 12px;
+    align-items: flex-end;
+  }
+
   .modal-content {
-    margin: 20px;
-    max-height: calc(100vh - 40px);
+    margin: 0;
+    max-height: calc(100vh - 24px);
   }
 
   .modal-header,
   .dialog-form {
     padding-left: 20px;
     padding-right: 20px;
+  }
+
+  .modal-header h3 {
+    font-size: 18px;
   }
 
   .type-selector,
@@ -955,6 +1012,12 @@ const closeModal = () => {
   .action-button-item {
     flex-direction: column;
     gap: 6px;
+  }
+
+  .action-btn-input,
+  .action-select {
+    width: 100%;
+    min-width: 0;
   }
 
   .form-actions {

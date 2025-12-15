@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import api from '../services/api'
 
 // تنظیمات پیش‌فرض برنامه
 const defaultSettings = {
@@ -38,29 +39,52 @@ const defaultSettings = {
 export const useAppSettingsStore = defineStore('appSettings', () => {
   const settings = ref({ ...defaultSettings })
   const settingsChanged = ref(false)
+  const loading = ref(false)
+  const error = ref(null)
 
-  // بارگذاری تنظیمات از localStorage
-  const loadSettings = () => {
-    const stored = localStorage.getItem('appSettings')
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored)
-        settings.value = { ...defaultSettings, ...parsed }
-      } catch (e) {
-        console.error('Error loading app settings:', e)
-        settings.value = { ...defaultSettings }
-        saveSettings()
+  // بارگذاری تنظیمات از API
+  const loadSettings = async () => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await api.get('/settings')
+      // Merge received settings with defaults to ensure structure
+      // Note: Assuming response.data follows the structure { general: {}, server: {}, ... }
+      if (response.data) {
+        // Deep merge or simple spread? Spread for categories seems safer for now
+        // If response excludes a category (e.g. notifications), keep default.
+        settings.value = {
+          ...defaultSettings,
+          ...response.data,
+          // Ensure sub-objects are also merged if partial data is returned,
+          // but simplest verification first:
+          general: { ...defaultSettings.general, ...(response.data.general || {}) },
+          notifications: { ...defaultSettings.notifications, ...(response.data.notifications || {}) },
+          server: { ...defaultSettings.server, ...(response.data.server || {}) }
+        }
       }
-    } else {
-      settings.value = { ...defaultSettings }
-      saveSettings()
+    } catch (e) {
+      console.error('Error loading app settings:', e)
+      error.value = 'خطا در بارگذاری تنظیمات'
+      // Fallback to local defaults is already set by initial ref
+    } finally {
+      loading.value = false
     }
   }
 
-  // ذخیره تنظیمات در localStorage
-  const saveSettings = () => {
-    localStorage.setItem('appSettings', JSON.stringify(settings.value))
-    settingsChanged.value = false
+  // ذخیره تنظیمات در API
+  const saveSettings = async () => {
+    loading.value = true
+    try {
+      await api.put('/settings', settings.value)
+      settingsChanged.value = false
+    } catch (e) {
+      console.error('Error saving app settings:', e)
+      error.value = 'خطا در ذخیره تنظیمات'
+      throw e // Let UI handle or display specific error
+    } finally {
+      loading.value = false
+    }
   }
 
   // بروزرسانی تنظیمات
@@ -68,6 +92,11 @@ export const useAppSettingsStore = defineStore('appSettings', () => {
     if (settings.value[category]) {
       settings.value[category] = { ...settings.value[category], ...newSettings }
       settingsChanged.value = true
+      // Auto-save logic? Or wait for explicit save?
+      // For specific updates (like toggles), we might want auto-save.
+      // But preserving 'save' button functionality in general settings page implies explicit save.
+      // However, typical settings pages often save on blur or store change.
+      // Let's call saveSettings() to persist immediately as per previous logic
       saveSettings()
     }
   }
@@ -92,14 +121,14 @@ export const useAppSettingsStore = defineStore('appSettings', () => {
   }
 
   // بازنشانی تنظیمات به پیش‌فرض
-  const resetToDefault = (category = null) => {
+  const resetToDefault = async (category = null) => {
     if (category) {
       settings.value[category] = { ...defaultSettings[category] }
     } else {
       settings.value = { ...defaultSettings }
     }
     settingsChanged.value = true
-    saveSettings()
+    await saveSettings()
   }
 
   // گرفتن تنظیمات برای خروجی JSON
@@ -108,14 +137,21 @@ export const useAppSettingsStore = defineStore('appSettings', () => {
   }
 
   // وارد کردن تنظیمات از JSON
-  const importSettings = (jsonString) => {
+  const importSettings = async (jsonString) => {
     try {
       const imported = JSON.parse(jsonString)
-      settings.value = { ...defaultSettings, ...imported }
+      settings.value = {
+        ...defaultSettings,
+        ...imported,
+        general: { ...defaultSettings.general, ...(imported.general || {}) },
+        notifications: { ...defaultSettings.notifications, ...(imported.notifications || {}) },
+        server: { ...defaultSettings.server, ...(imported.server || {}) }
+      }
       settingsChanged.value = true
-      saveSettings()
+      await saveSettings()
       return { success: true, message: 'تنظیمات با موفقیت وارد شد' }
     } catch (e) {
+      console.error('Import error:', e)
       return { success: false, message: 'فرمت JSON نامعتبر است' }
     }
   }
@@ -159,6 +195,8 @@ const settingsCategories = [
     settingsChanged,
     settingsCategories,
     hasUnsavedChanges,
+    loading,
+    error,
     loadSettings,
     saveSettings,
     updateSettings,
