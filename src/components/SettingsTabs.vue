@@ -266,7 +266,8 @@ watch(() => props.initialTab, (newTab) => {
 
   .tabs-list {
     width: 100%;
-    justify-content: center;
+    justify-content: flex-start; /* Prevent clipping on small screens */
+    padding-bottom: 4px; /* Space for scrollbar if visible */
   }
 }
 

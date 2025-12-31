@@ -211,6 +211,45 @@ onMounted(() => {
   background-color: #bee3f8;
   color: #2c5282;
 }
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .content-card {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+  
+  .page-description {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+  
+  .content-card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .card-header h2 {
+    font-size: 18px;
+  }
+  
+  .refresh-btn {
+    width: 100%;
+    padding: 10px;
+  }
+}
 </style>
 
 

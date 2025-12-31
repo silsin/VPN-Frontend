@@ -19,7 +19,7 @@
             <div class="ad-placement-info">
               <div class="ad-placement-name">{{ ad.name }}</div>
               <div class="ad-placement-type">
-                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}</span>
+                <span class="type-badge" :class="ad.type === 'video_ad' ? 'video' : ad.type">{{ (ad.type === 'video' || ad.type === 'video_ad') ? 'ویدیو' : ad.type === 'banner' ? 'بنر' : 'جایزه‌ای' }}</span>
               </div>
             </div>
             <div class="ad-placement-toggle">
@@ -40,38 +40,7 @@
         </div>
       </div>
 
-      <div class="placement-section">
-        <h4>⚡ صفحه اسپلش - میان‌صفحه‌ای</h4>
-        <div class="placement-ads">
-          <div
-            v-for="ad in getAdsForPlacement('splash_interstitial')"
-            :key="ad.id"
-            class="ad-placement-card"
-            :class="{ active: isAdEnabledForPlacement(ad.id, 'splash_interstitial') }"
-          >
-            <div class="ad-placement-info">
-              <div class="ad-placement-name">{{ ad.name }}</div>
-              <div class="ad-placement-type">
-                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}</span>
-              </div>
-            </div>
-            <div class="ad-placement-toggle">
-              <div class="toggle-switch">
-                <input
-                  type="checkbox"
-                  :id="'splash-interstitial-' + ad.id"
-                  :checked="isAdEnabledForPlacement(ad.id, 'splash_interstitial')"
-                  @change="toggleAdForPlacement(ad.id, 'splash_interstitial')"
-                />
-                <label :for="'splash-interstitial-' + ad.id" class="toggle-slider"></label>
-              </div>
-            </div>
-          </div>
-          <div v-if="getAdsForPlacement('splash_interstitial').length === 0" class="no-ads-message">
-            هیچ تبلیغی برای این جایگاه تعریف نشده است
-          </div>
-        </div>
-      </div>
+
 
       <div class="placement-section">
         <h4>📱 صفحه اصلی - بنر</h4>
@@ -85,7 +54,7 @@
             <div class="ad-placement-info">
               <div class="ad-placement-name">{{ ad.name }}</div>
               <div class="ad-placement-type">
-                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}</span>
+                <span class="type-badge" :class="ad.type === 'video_ad' ? 'video' : ad.type">{{ (ad.type === 'video' || ad.type === 'video_ad') ? 'ویدیو' : ad.type === 'banner' ? 'بنر' : 'جایزه‌ای' }}</span>
               </div>
             </div>
             <div class="ad-placement-toggle">
@@ -118,7 +87,7 @@
             <div class="ad-placement-info">
               <div class="ad-placement-name">{{ ad.name }}</div>
               <div class="ad-placement-type">
-                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}</span>
+                <span class="type-badge" :class="ad.type === 'video_ad' ? 'video' : ad.type">{{ (ad.type === 'video' || ad.type === 'video_ad') ? 'ویدیو' : ad.type === 'banner' ? 'بنر' : 'جایزه‌ای' }}</span>
               </div>
             </div>
             <div class="ad-placement-toggle">
@@ -151,7 +120,7 @@
             <div class="ad-placement-info">
               <div class="ad-placement-name">{{ ad.name }}</div>
               <div class="ad-placement-type">
-                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}</span>
+                <span class="type-badge" :class="ad.type === 'video_ad' ? 'video' : ad.type">{{ (ad.type === 'video' || ad.type === 'video_ad') ? 'ویدیو' : ad.type === 'banner' ? 'بنر' : 'جایزه‌ای' }}</span>
               </div>
             </div>
             <div class="ad-placement-toggle">
@@ -184,7 +153,7 @@
             <div class="ad-placement-info">
               <div class="ad-placement-name">{{ ad.name }}</div>
               <div class="ad-placement-type">
-                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}</span>
+                <span class="type-badge" :class="ad.type === 'video_ad' ? 'video' : ad.type">{{ (ad.type === 'video' || ad.type === 'video_ad') ? 'ویدیو' : ad.type === 'banner' ? 'بنر' : 'جایزه‌ای' }}</span>
               </div>
             </div>
             <div class="ad-placement-toggle">
@@ -217,7 +186,7 @@
             <div class="ad-placement-info">
               <div class="ad-placement-name">{{ ad.name }}</div>
               <div class="ad-placement-type">
-                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}</span>
+                <span class="type-badge" :class="ad.type === 'video_ad' ? 'video' : ad.type">{{ (ad.type === 'video' || ad.type === 'video_ad') ? 'ویدیو' : ad.type === 'banner' ? 'بنر' : 'جایزه‌ای' }}</span>
               </div>
             </div>
             <div class="ad-placement-toggle">
@@ -250,7 +219,7 @@
             <div class="ad-placement-info">
               <div class="ad-placement-name">{{ ad.name }}</div>
               <div class="ad-placement-type">
-                <span class="type-badge" :class="ad.type">{{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}</span>
+                <span class="type-badge" :class="ad.type === 'video_ad' ? 'video' : ad.type">{{ (ad.type === 'video' || ad.type === 'video_ad') ? 'ویدیو' : ad.type === 'banner' ? 'بنر' : 'جایزه‌ای' }}</span>
               </div>
             </div>
             <div class="ad-placement-toggle">
@@ -300,17 +269,7 @@
                 <div class="logo-text">FlyVPN</div>
               </div>
 
-              <!-- تبلیغ میان‌صفحه‌ای اسپلش -->
-              <div
-                v-if="hasActiveAdsForPlacement('splash_interstitial')"
-                class="interstitial-overlay"
-              >
-                <div class="interstitial-content">
-                  <div class="interstitial-icon">⚡</div>
-                  <div class="interstitial-text">تبلیغ میان‌صفحه‌ای</div>
-                  <div class="interstitial-sub">در حال انتقال به خانه...</div>
-                </div>
-              </div>
+
 
               <!-- بنر اسپلش -->
               <div
@@ -455,8 +414,8 @@ onMounted(() => {
 
 .placement-management {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
   margin-bottom: 48px;
 }
 
@@ -495,6 +454,7 @@ onMounted(() => {
   border-radius: 12px;
   border: 1px solid rgba(102, 126, 234, 0.1);
   transition: all 0.2s ease;
+  gap: 12px; /* Added gap for better spacing */
 }
 
 .ad-placement-card:hover {
@@ -853,7 +813,7 @@ input:checked + .toggle-slider:before {
 }
 
 @media (max-width: 1024px) {
-  .placement-controls {
+  .placement-management {
     grid-template-columns: 1fr;
     gap: 24px;
   }
@@ -861,30 +821,36 @@ input:checked + .toggle-slider:before {
 
 @media (max-width: 768px) {
   .placement-manager {
-    padding: 0 15px;
+    padding: 0 16px;
   }
 
-  .mobile-device {
-    width: 260px;
-    height: 520px;
+  .manager-header h3 {
+    font-size: 20px;
   }
-
-  .placement-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+  
+  .placement-section {
+    padding: 16px;
   }
-
-  .placement-info {
+  
+  .ad-placement-card {
+    padding: 12px;
+    flex-direction: column; /* Stack content on mobile */
+    align-items: stretch; /* Full width */
+    gap: 16px;
+  }
+  
+  .ad-placement-info {
     width: 100%;
+    justify-content: space-between;
   }
-
-  .placement-toggle {
+  
+  .ad-placement-toggle {
     align-self: flex-end;
   }
-
-  .control-group {
-    padding: 20px;
+  
+  .mobile-device {
+    width: 280px;
+    height: 560px;
   }
 }
 </style>

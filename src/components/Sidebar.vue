@@ -87,13 +87,16 @@ defineEmits(['close', 'menu-click']);
   display: flex;
   flex-direction: column;
   transform: translateX(100%);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  visibility: hidden; /* Hide from interactions when closed */
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s;
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
 }
 
 .sidebar-open {
   transform: translateX(0);
+  visibility: visible;
 }
+
 
 .sidebar-header {
   padding: 24px 20px;

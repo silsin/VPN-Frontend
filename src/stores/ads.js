@@ -39,6 +39,10 @@ export const useAdsStore = defineStore('ads', () => {
     loading.value = true
     error.value = null
     try {
+      // Normalize type for backend
+      if (adData.type === 'video_ad') {
+        adData.type = 'video'
+      }
       const response = await api.post('/ads', adData)
       ads.value.push(response.data)
       return response.data
@@ -56,6 +60,10 @@ export const useAdsStore = defineStore('ads', () => {
     loading.value = true
     error.value = null
     try {
+      // Normalize type for backend
+      if (updatedData.type === 'video_ad') {
+        updatedData.type = 'video'
+      }
       const response = await api.patch(`/ads/${id}`, updatedData)
       const index = ads.value.findIndex(ad => ad.id === id)
       if (index !== -1) {
@@ -115,7 +123,7 @@ export const useAdsStore = defineStore('ads', () => {
       total: ads.value.length,
       active: ads.value.filter(ad => ad.isActive === true).length,
       banners: ads.value.filter(ad => ad.type === 'banner').length,
-      videos: ads.value.filter(ad => ad.type === 'video_ad').length,
+      videos: ads.value.filter(ad => ad.type === 'video').length,
       rewards: ads.value.filter(ad => ad.type === 'reward').length,
       android: ads.value.filter(ad => ad.platform === 'android' || ad.platform === 'both').length,
       ios: ads.value.filter(ad => ad.platform === 'ios' || ad.platform === 'both').length
@@ -125,7 +133,6 @@ export const useAdsStore = defineStore('ads', () => {
   // Placement types
   const placementTypes = [
     { key: 'splash', label: 'بنر اسپلش', icon: '📱' },
-    { key: 'splash_interstitial', label: 'میان‌صفحه‌ای اسپلش', icon: '⚡' },
     { key: 'main_page', label: 'بنر صفحه اصلی', icon: '🏠' },
     { key: 'video_ad', label: 'تبلیغات ویدیویی', icon: '🎬' },
     { key: 'reward_video', label: 'ویدیو جایزه‌ای', icon: '🎁' },
@@ -144,12 +151,19 @@ export const useAdsStore = defineStore('ads', () => {
   // Ad types
   const adTypes = [
     { value: 'banner', label: 'بنر' },
-    { value: 'video_ad', label: 'ویدیو' },
+    { value: 'video', label: 'ویدیو' },
     { value: 'reward', label: 'جایزه‌ای' }
   ]
 
   // Validate ad
   const validateAd = (ad) => {
+    // Normalize type for internal validation and consistency
+    if (ad.type === 'video_ad') {
+      ad.type = 'video'
+    }
+    
+    console.log('Validating ad data:', ad)
+    
     if (!ad.name || !ad.name.trim()) {
       return { isValid: false, error: 'نام تبلیغ نمی‌تواند خالی باشد' }
     }
@@ -162,7 +176,8 @@ export const useAdsStore = defineStore('ads', () => {
       return { isValid: false, error: 'مکان نمایش باید انتخاب شود' }
     }
 
-    if (!['banner', 'video_ad', 'reward'].includes(ad.type)) {
+    if (!['banner', 'video', 'reward'].includes(ad.type)) {
+      console.warn('Invalid ad type detected:', ad.type)
       return { isValid: false, error: 'نوع تبلیغ نامعتبر است' }
     }
 
@@ -177,7 +192,6 @@ export const useAdsStore = defineStore('ads', () => {
   const placements = computed(() => {
     const result = {
       splash: [],
-      splash_interstitial: [],
       main_page: [],
       video_ad: [],
       reward_video: [],

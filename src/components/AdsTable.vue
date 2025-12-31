@@ -32,14 +32,14 @@
                 class="ad-type"
                 :class="{
                   'type-banner': ad.type === 'banner',
-                  'type-video': ad.type === 'video_ad',
+                  'type-video': ad.type === 'video' || ad.type === 'video_ad',
                   'type-reward': ad.type === 'reward'
                 }"
               >
                 <span class="type-icon" v-if="ad.type === 'banner'">📄</span>
-                <span class="type-icon" v-else-if="ad.type === 'video_ad'">🎥</span>
+                <span class="type-icon" v-else-if="ad.type === 'video' || ad.type === 'video_ad'">🎥</span>
                 <span class="type-icon" v-else>🎁</span>
-                {{ ad.type === 'banner' ? 'بنر' : ad.type === 'video_ad' ? 'ویدیو' : 'جایزه‌ای' }}
+                {{ ad.type === 'banner' ? 'بنر' : (ad.type === 'video' || ad.type === 'video_ad') ? 'ویدیو' : 'جایزه‌ای' }}
               </span>
             </td>
             <td>
@@ -417,7 +417,7 @@ const confirmDelete = (ad) => {
 
 @media (max-width: 768px) {
   .ads-table-container {
-    padding: 20px;
+    padding: 16px;
   }
 
   .table-header {
@@ -425,18 +425,45 @@ const confirmDelete = (ad) => {
     gap: 16px;
     align-items: stretch;
   }
+  
+  .add-btn {
+    justify-content: center;
+  }
 
   .ads-table th,
   .ads-table td {
-    padding: 12px 8px;
+    padding: 10px 8px;
+    font-size: 13px;
+    white-space: nowrap; /* Prevent line breaks messing up rows */
   }
 
   .ad-key {
-    max-width: 150px;
+    max-width: 120px;
   }
 
   .key-preview {
-    font-size: 12px;
+    font-size: 11px;
+  }
+  
+  /* Hide less important columns on mobile */
+  .ads-table th:nth-child(6), /* Created At Header */
+  .ads-table td:nth-child(6)  /* Created At Data */
+  {
+    display: none;
+  }
+  
+  .status-badge {
+    padding: 2px 8px;
+    font-size: 11px;
+  }
+  
+  .actions {
+    gap: 4px;
+  }
+  
+  .edit-btn, .status-btn, .delete-btn {
+    padding: 4px;
+    font-size: 14px;
   }
 }
 </style>

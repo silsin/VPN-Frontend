@@ -85,24 +85,10 @@ const handleMenuClick = (item) => {
     router.push({ name: item.route });
   }
 
-  if (window.innerWidth <= 768) {
-    isSidebarOpen.value = false;
-  }
+  // Always close sidebar after selection since it is an overlay
+  isSidebarOpen.value = false;
 };
 
-const handleResize = () => {
-  if (window.innerWidth > 768) {
-    isSidebarOpen.value = false;
-  }
-};
-
-onMounted(() => {
-  window.addEventListener("resize", handleResize);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("resize", handleResize);
-});
 </script>
 
 <style scoped>
@@ -138,6 +124,10 @@ onUnmounted(() => {
 }
 
 @media (max-width: 480px) {
+  .dashboard-container {
+    display: block; /* Disable flex on mobile to prevent squashing */
+  }
+  
   .dashboard-main {
     padding: 16px;
   }

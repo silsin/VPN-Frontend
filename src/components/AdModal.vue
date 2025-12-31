@@ -36,8 +36,8 @@
             <button
               type="button"
               class="type-btn"
-              :class="{ active: formData.type === 'video_ad' }"
-              @click="formData.type = 'video_ad'"
+              :class="{ active: formData.type === 'video' }"
+              @click="formData.type = 'video'"
             >
               <span class="type-icon">🎥</span>
               ویدیو
@@ -123,19 +123,7 @@
               </div>
             </label>
 
-            <label class="placement-radio">
-              <input
-                type="radio"
-                name="placement"
-                value="splash_interstitial"
-                v-model="formData.placement"
-              />
-              <span class="checkmark"></span>
-              <div class="placement-info">
-                <span class="placement-icon">⚡</span>
-                <span class="placement-name">میان‌صفحه‌ای اسپلش</span>
-              </div>
-            </label>
+
 
             <label class="placement-radio">
               <input
@@ -305,7 +293,7 @@ watch(() => props.isOpen, (isOpen) => {
     if (props.editingAd) {
       formData.value = {
         name: props.editingAd.name,
-        type: props.editingAd.type,
+        type: props.editingAd.type === 'video_ad' ? 'video' : props.editingAd.type, // تبدیل مقادیر قدیمی
         platform: props.editingAd.platform,
         adUnitId: props.editingAd.adUnitId,
         placement: props.editingAd.placement || '',
@@ -389,7 +377,11 @@ const handleSubmit = async () => {
     closeModal()
   } catch (error) {
     console.error('Error saving ad:', error)
-    validationError.value = 'خطایی در ذخیره تبلیغ رخ داد'
+    if (error.response?.status === 401) {
+      validationError.value = 'نشست شما منقضی شده است. لطفا دوباره وارد شوید.'
+    } else {
+      validationError.value = error.response?.data?.message || 'خطایی در ذخیره تبلیغ رخ داد'
+    }
   } finally {
     isSubmitting.value = false
   }

@@ -33,8 +33,9 @@ api.interceptors.response.use(
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       localStorage.removeItem('isAuthenticated')
-      // You might want to redirect to login page here or emit an event
-      // window.location.href = '/login'
+      
+      // Redirect to login page
+      window.location.href = '/login'
     }
     return Promise.reject(error)
   }

@@ -81,12 +81,12 @@ const handleLogin = async () => {
 .login-container {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  /* align-items: center; Removed to prevent clipping on small height/keyboard open */
+  /* justify-content: center; Removed to prevent clipping */
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
   position: relative;
-  overflow: hidden;
+  overflow-y: auto; /* Allow scrolling */
 }
 
 .login-container::before {
@@ -112,6 +112,7 @@ const handleLogin = async () => {
 }
 
 .login-card {
+  margin: auto;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border-radius: 24px;
@@ -170,7 +171,7 @@ const handleLogin = async () => {
   padding: 14px 18px;
   border: 2px solid #e2e8f0;
   border-radius: 12px;
-  font-size: 15px;
+  font-size: 16px;
   transition: all 0.3s ease;
   font-family: 'Vazirmatn', sans-serif;
   background: #ffffff;
@@ -240,12 +241,16 @@ const handleLogin = async () => {
 
 /* Mobile Medium */
 @media (max-width: 480px) {
+  .login-container::before {
+    display: none; /* Save performance and prevent glitches */
+  }
+
   .login-container {
     padding: 16px;
   }
 
   .login-card {
-    padding: 32px 24px;
+    padding: 24px 16px;
   }
 
   .login-header {
