@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://fly-api.online/api/v1',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://fly-api.online/api/v1',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
