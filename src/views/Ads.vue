@@ -123,19 +123,19 @@ onMounted(() => {
 }
 
 .page-title {
-  font-size: 32px;
-  font-weight: 700;
+  font-size: 36px;
+  font-weight: 800;
   margin: 0 0 12px 0;
   font-family: "Vazirmatn", sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
   text-align: center;
+  letter-spacing: -1px;
 }
 
 .page-description {
-  color: rgba(255, 255, 255, 0.9);
+  color: #94a3b8;
   font-size: 16px;
   margin: 0 0 40px 0;
   font-family: "Vazirmatn", sans-serif;
@@ -143,146 +143,72 @@ onMounted(() => {
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
+  font-weight: 500;
 }
 
 .stats-section {
   margin-bottom: 48px;
 }
 
-.stats-container {
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 24px;
-  margin: 0 auto;
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(25px) saturate(180%);
+  border-radius: 24px;
   padding: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   gap: 20px;
-  transition: all 0.3s ease;
-  justify-content: center;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-8px) scale(1.02);
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(129, 140, 248, 0.3);
 }
 
 .stat-icon {
-  font-size: 36px;
-  flex-shrink: 0;
+  font-size: 32px;
+  background: rgba(129, 140, 248, 0.1);
+  padding: 12px;
+  border-radius: 18px;
+  line-height: 1;
 }
 
 .stat-content {
   flex: 1;
-  text-align: center;
 }
 
 .stat-number {
   font-size: 32px;
-  font-weight: 700;
-  color: #2d3748;
+  font-weight: 800;
+  color: #ffffff;
   font-family: "Vazirmatn", sans-serif;
-  margin-bottom: 6px;
-  line-height: 1;
+  margin-bottom: 2px;
+  letter-spacing: -1px;
 }
 
 .stat-label {
   font-size: 14px;
-  color: #718096;
+  color: #94a3b8;
   font-family: "Vazirmatn", sans-serif;
   font-weight: 500;
 }
 
-@media (max-width: 1024px) {
-  .page-content {
-    padding: 0 20px;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    max-width: 600px;
-  }
-
-  .stat-card {
-    padding: 20px;
-  }
-
-  .stat-icon {
-    font-size: 32px;
-  }
-
-  .stat-number {
-    font-size: 28px;
-  }
-}
-
 @media (max-width: 768px) {
-  .page-content {
-    padding: 0 16px;
-  }
-
-  .page-title {
-    font-size: 28px;
-  }
-
-  .page-description {
-    font-size: 15px;
-    margin-bottom: 32px;
-  }
-
-  .stats-section {
-    margin-bottom: 40px;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-    max-width: 400px;
-  }
-
-  .stat-card {
-    padding: 18px;
-    gap: 16px;
-  }
-
-  .stat-icon {
-    font-size: 28px;
-  }
-
-  .stat-number {
-    font-size: 24px;
-  }
-
-  .stat-label {
-    font-size: 13px;
-  }
+  .page-title { font-size: 28px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
 }
 
 @media (max-width: 480px) {
-  .page-content {
-    padding: 0 12px;
-  }
-
-  .page-title {
-    font-size: 24px;
-  }
-
-  .page-description {
-    font-size: 14px;
-  }
+  .stats-grid { grid-template-columns: 1fr; }
 }
 </style>

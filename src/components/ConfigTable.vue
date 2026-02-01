@@ -33,14 +33,14 @@
             <td>
               <span
                 class="config-type"
-                :class="config.type === 'link' ? 'type-link' : 'type-json'"
+                :class="getTypeClass(config.type)"
               >
-                {{ config.type === 'link' ? 'لینک V2Ray' : 'کانفیگ JSON' }}
+                {{ getProtocolLabel(config.type) }}
               </span>
             </td>
             <td class="config-content">
               <div class="content-preview">
-                {{ getContentPreview(config.content) }}
+                {{ getContentPreview(config.content, config.type) }}
               </div>
             </td>
             <td class="config-date">
@@ -93,16 +93,58 @@ defineProps({
 
 const emit = defineEmits(['add-config', 'edit-config', 'delete-config'])
 
-const getContentPreview = (content) => {
+const getProtocolLabel = (type) => {
+  const labels = {
+    link: 'V2Ray Link',
+    json: 'JSON Config',
+    openvpn: 'OpenVPN',
+    sstp: 'SSTP',
+    ssh: 'SSH'
+  }
+  return labels[type] || type
+}
+
+const getTypeClass = (type) => {
+  const classes = {
+    link: 'type-link',
+    json: 'type-json',
+    openvpn: 'type-ovpn',
+    sstp: 'type-sstp',
+    ssh: 'type-ssh'
+  }
+  return classes[type] || 'type-default'
+}
+
+const getContentPreview = (content, type) => {
   if (!content) return '-'
 
-  // برای لینک‌ها، فقط پروتکل و آدرس سرور نمایش داده شود
-  if (content.includes('://')) {
-    const url = new URL(content)
-    return `${url.protocol}//${url.hostname}${url.port ? ':' + url.port : ''}`
+  // Handle SSH/SSTP JSON content
+  if (['ssh', 'sstp'].includes(type)) {
+    try {
+      const parsed = JSON.parse(content)
+      if (type === 'ssh') return `${parsed.username}@${parsed.host}:${parsed.port || 22}`
+      if (type === 'sstp') return `${parsed.username}@${parsed.server}`
+    } catch {
+      return content.substring(0, 30) + '...'
+    }
   }
 
-  // برای JSON، فقط نام نمایش داده شود اگر موجود باشد
+  // برای لینک‌ها
+  if (content.includes('://')) {
+    try {
+      const url = new URL(content)
+      return `${url.protocol}//${url.hostname}${url.port ? ':' + url.port : ''}`
+    } catch {
+      return content.substring(0, 30) + '...'
+    }
+  }
+
+  // اگر محتوای OpenVPN باشد (فایل متنی)
+  if (content.includes('client') || content.includes('remote ')) {
+    return 'OpenVPN Config File'
+  }
+
+  // برای JSON
   try {
     const parsed = JSON.parse(content)
     return parsed.ps || parsed.name || 'کانفیگ JSON'
@@ -131,219 +173,170 @@ const confirmDelete = (config) => {
 
 <style scoped>
 .config-table-container {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(25px) saturate(180%);
+  border-radius: 28px;
   padding: 32px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 32px;
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .table-header h3 {
-  color: #2d3748;
-  font-size: 20px;
-  font-weight: 700;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 800;
   margin: 0;
   font-family: "Vazirmatn", sans-serif;
 }
 
 .add-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
   color: white;
   border: none;
-  padding: 12px 20px;
-  border-radius: 12px;
-  font-weight: 600;
+  padding: 14px 24px;
+  border-radius: 16px;
+  font-weight: 700;
   font-family: "Vazirmatn", sans-serif;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
 }
 
 .add-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.add-btn span {
-  font-size: 18px;
-  font-weight: bold;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(99, 102, 241, 0.5);
+  filter: brightness(1.1);
 }
 
 .table-wrapper {
   overflow-x: auto;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .config-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-family: "Vazirmatn", sans-serif;
 }
 
-.config-table th,
-.config-table td {
-  padding: 16px;
+.config-table th {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 20px 24px;
   text-align: right;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  color: #94a3b8;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.config-table th {
-  background: rgba(102, 126, 234, 0.1);
-  color: #2d3748;
-  font-weight: 600;
-  font-size: 14px;
+.config-table td {
+  padding: 20px 24px;
+  text-align: right;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: #e2e8f0;
+  vertical-align: middle;
+}
+
+.config-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.config-name {
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 15px;
+}
+
+.config-type {
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.config-table tr:hover {
-  background: rgba(102, 126, 234, 0.05);
-}
-
-.config-name {
-  font-weight: 600;
-  color: #2d3748;
-}
-
-.config-flag span {
-  font-size: 20px;
-  border-radius: 4px;
-  display: block; /* Ensure it stays neat */
-}
-
-.config-type {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.type-link {
-  background: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
-}
-
-.type-json {
-  background: rgba(251, 146, 60, 0.1);
-  color: #ea580c;
-}
-
-.config-content {
-  max-width: 300px;
-}
+.type-link { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+.type-json { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+.type-ovpn { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
+.type-sstp { background: rgba(168, 85, 247, 0.1); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.2); }
+.type-ssh { background: rgba(148, 163, 184, 0.1); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }
 
 .content-preview {
   font-family: 'Courier New', monospace;
   font-size: 13px;
-  color: #4a5568;
-  word-break: break-all;
+  color: #94a3b8;
+  opacity: 0.8;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 6px 12px;
+  border-radius: 8px;
+  display: inline-block;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .config-date {
-  color: #718096;
+  color: #64748b;
   font-size: 13px;
   direction: ltr;
 }
 
 .actions {
   display: flex;
-  gap: 8px;
-  justify-content: center;
+  gap: 10px;
+  justify-content: flex-end;
 }
 
-.edit-btn,
-.delete-btn {
-  background: none;
-  border: none;
-  padding: 8px;
-  border-radius: 8px;
+.edit-btn, .delete-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  font-size: 14px;
 }
 
 .edit-btn:hover {
-  background: rgba(59, 130, 246, 0.1);
-  transform: scale(1.1);
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: #818cf8;
+  transform: translateY(-2px);
 }
 
 .delete-btn:hover {
-  background: rgba(239, 68, 68, 0.1);
-  transform: scale(1.1);
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #718096;
-}
-
-.empty-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-}
-
-.empty-state h4 {
-  color: #2d3748;
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0 0 8px 0;
-  font-family: "Vazirmatn", sans-serif;
-}
-
-.empty-state p {
-  margin: 0 0 24px 0;
-  font-family: "Vazirmatn", sans-serif;
-}
-
-.add-btn-empty {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 14px 28px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-family: "Vazirmatn", sans-serif;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.add-btn-empty:hover {
+  background: rgba(244, 63, 94, 0.15);
+  border-color: rgba(244, 63, 94, 0.3);
+  color: #fb7185;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 @media (max-width: 768px) {
-  .config-table-container {
-    padding: 20px;
-  }
-
-  .table-header {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-
-  .config-table th,
-  .config-table td {
-    padding: 12px 8px;
-  }
-
-  .config-content {
-    max-width: 150px;
-  }
-
-  .content-preview {
-    font-size: 12px;
-  }
+  .config-table-container { padding: 20px; border-radius: 20px; }
+  .table-header { flex-direction: column; gap: 20px; align-items: stretch; }
+  .config-table th, .config-table td { padding: 16px 12px; }
 }
 </style>

@@ -65,6 +65,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/free-configs',
+      name: 'FreeConfigs',
+      component: () => import('../views/FreeConfigs.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/',
       redirect: '/login'
     }

@@ -155,315 +155,152 @@ const confirmDelete = (ad) => {
 
 <style scoped>
 .ads-table-container {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(25px) saturate(180%);
+  border-radius: 28px;
   padding: 32px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 32px;
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .table-header h3 {
-  color: #2d3748;
-  font-size: 20px;
-  font-weight: 700;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 800;
   margin: 0;
   font-family: "Vazirmatn", sans-serif;
 }
 
 .add-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
   color: white;
   border: none;
-  padding: 12px 20px;
-  border-radius: 12px;
-  font-weight: 600;
+  padding: 14px 24px;
+  border-radius: 16px;
+  font-weight: 700;
   font-family: "Vazirmatn", sans-serif;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
 }
 
 .add-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.add-btn span {
-  font-size: 18px;
-  font-weight: bold;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(99, 102, 241, 0.5);
+  filter: brightness(1.1);
 }
 
 .table-wrapper {
   overflow-x: auto;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .ads-table {
   width: 100%;
-  border-collapse: collapse;
-  font-family: "Vazirmatn", sans-serif;
-}
-
-.ads-table th,
-.ads-table td {
-  padding: 16px;
-  text-align: right;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .ads-table th {
-  background: rgba(102, 126, 234, 0.1);
-  color: #2d3748;
-  font-weight: 600;
-  font-size: 14px;
+  padding: 20px 24px;
+  text-align: right;
+  color: #94a3b8;
+  font-weight: 700;
+  font-size: 13px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.ads-table tr:hover {
-  background: rgba(102, 126, 234, 0.05);
+.ads-table td {
+  padding: 20px 24px;
+  text-align: right;
+  color: #e2e8f0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-.ad-name {
-  font-weight: 600;
-  color: #2d3748;
+.ads-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
 }
+
+.ad-name { font-weight: 700; color: #ffffff; }
 
 .ad-type {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 800;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  text-transform: uppercase;
 }
 
-.type-banner {
-  background: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
-}
-
-.type-video {
-  background: rgba(251, 146, 60, 0.1);
-  color: #ea580c;
-}
-
-.type-reward {
-  background: rgba(168, 85, 247, 0.1);
-  color: #9333ea;
-}
+.type-banner { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+.type-video { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+.type-reward { background: rgba(168, 85, 247, 0.1); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.2); }
 
 .platform-badge {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.platform-badge.android {
-  background: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
-}
+.platform-badge.android { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+.platform-badge.ios { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
 
-.platform-badge.ios {
-  background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-}
-
-.platform-badge.both {
-  background: rgba(59, 130, 246, 0.1);
-  color: #2563eb;
-}
-
-.ad-key {
-  max-width: 250px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.key-preview {
-  font-family: 'Courier New', monospace;
-  font-size: 13px;
-  color: #4a5568;
-  flex: 1;
-}
-
-.copy-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-  font-size: 14px;
-}
-
-.copy-btn:hover {
-  background: rgba(102, 126, 234, 0.1);
-}
+.ad-key { display: flex; align-items: center; gap: 10px; }
+.key-preview { font-family: 'Courier New', monospace; font-size: 13px; opacity: 0.7; }
 
 .status-badge {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 800;
 }
 
-.status-badge.active {
-  background: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
-}
+.status-badge.active { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+.status-badge.inactive { background: rgba(244, 63, 94, 0.1); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.2); }
 
-.status-badge.inactive {
-  background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-}
-
-.ad-date {
-  color: #718096;
-  font-size: 13px;
-  direction: ltr;
-}
-
-.actions {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-}
-
-.edit-btn,
-.status-btn,
-.delete-btn {
-  background: none;
-  border: none;
-  padding: 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 16px;
-}
-
-.edit-btn:hover {
-  background: rgba(59, 130, 246, 0.1);
-  transform: scale(1.1);
-}
-
-.status-btn:hover {
-  background: rgba(251, 146, 60, 0.1);
-  transform: scale(1.1);
-}
-
-.delete-btn:hover {
-  background: rgba(239, 68, 68, 0.1);
-  transform: scale(1.1);
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #718096;
-}
-
-.empty-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-}
-
-.empty-state h4 {
-  color: #2d3748;
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0 0 8px 0;
-  font-family: "Vazirmatn", sans-serif;
-}
-
-.empty-state p {
-  margin: 0 0 24px 0;
-  font-family: "Vazirmatn", sans-serif;
-}
-
-.add-btn-empty {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 14px 28px;
+.actions { display: flex; gap: 10px; justify-content: flex-end; }
+.edit-btn, .status-btn, .delete-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px;
   border-radius: 12px;
-  font-weight: 600;
-  font-family: "Vazirmatn", sans-serif;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.add-btn-empty:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
+.edit-btn:hover { background: rgba(99, 102, 241, 0.15); color: #818cf8; transform: translateY(-2px); }
+.status-btn:hover { background: rgba(245, 158, 11, 0.15); color: #fbbf24; transform: translateY(-2px); }
+.delete-btn:hover { background: rgba(244, 63, 94, 0.15); color: #fb7185; transform: translateY(-2px); }
 
 @media (max-width: 768px) {
-  .ads-table-container {
-    padding: 16px;
-  }
-
-  .table-header {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-  
-  .add-btn {
-    justify-content: center;
-  }
-
-  .ads-table th,
-  .ads-table td {
-    padding: 10px 8px;
-    font-size: 13px;
-    white-space: nowrap; /* Prevent line breaks messing up rows */
-  }
-
-  .ad-key {
-    max-width: 120px;
-  }
-
-  .key-preview {
-    font-size: 11px;
-  }
-  
-  /* Hide less important columns on mobile */
-  .ads-table th:nth-child(6), /* Created At Header */
-  .ads-table td:nth-child(6)  /* Created At Data */
-  {
-    display: none;
-  }
-  
-  .status-badge {
-    padding: 2px 8px;
-    font-size: 11px;
-  }
-  
-  .actions {
-    gap: 4px;
-  }
-  
-  .edit-btn, .status-btn, .delete-btn {
-    padding: 4px;
-    font-size: 14px;
-  }
+  .ads-table-container { padding: 20px; border-radius: 20px; }
+  .table-header { flex-direction: column; gap: 20px; align-items: stretch; }
+  .ads-table th, .ads-table td { padding: 16px 12px; }
 }
 </style>

@@ -22,11 +22,22 @@ export const useConfigStore = defineStore('config', () => {
     }
   }
 
+  const getProtocolLabel = (type) => {
+    const labels = {
+      link: 'V2Ray Link',
+      json: 'JSON Config',
+      openvpn: 'OpenVPN',
+      sstp: 'SSTP',
+      ssh: 'SSH'
+    }
+    return labels[type] || type
+  }
+
   // Helper to denormalize config for API
   const denormalizeConfig = (config) => {
     return {
       ...config,
-      type: config.type === 'link' ? 'v2ray_link' : 'json_config'
+      type: config.type === 'link' ? 'v2ray_link' : (config.type === 'json' ? 'json_config' : config.type)
     }
   }
 
@@ -190,6 +201,10 @@ export const useConfigStore = defineStore('config', () => {
       } catch (e) {
         return { isValid: false, error: 'فرمت JSON نامعتبر است' }
       }
+    } else if (['openvpn', 'sstp', 'ssh'].includes(type)) {
+      if (!content || content.length < 5) {
+        return { isValid: false, error: `محتوای ${type.toUpperCase()} نامعتبر است` }
+      }
     }
 
     return { isValid: true, error: null }
@@ -211,6 +226,7 @@ export const useConfigStore = defineStore('config', () => {
     setFilterType,
     validateV2RayConfig,
     loadConfigs,
-    fetchStats
+    fetchStats,
+    getProtocolLabel
   }
 })

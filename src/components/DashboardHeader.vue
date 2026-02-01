@@ -29,14 +29,14 @@ defineEmits(['toggle-sidebar']);
 
 <style scoped>
 .dashboard-header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  padding: 20px 40px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px 40px;
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
 }
 
 .header-content {
@@ -45,102 +45,80 @@ defineEmits(['toggle-sidebar']);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
 }
 
 .hamburger-button {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 12px;
+  border-radius: 12px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .hamburger-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
 }
 
 .hamburger-button span {
-  width: 22px;
-  height: 3px;
+  width: 20px;
+  height: 2px;
   background: #ffffff;
   border-radius: 2px;
-  transition: all 0.3s ease;
 }
 
 .dashboard-header h1 {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 800;
   margin: 0;
-  color: #2d3748;
   font-family: "Vazirmatn", sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
+  letter-spacing: -0.5px;
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 16px;
-  background: rgba(102, 126, 234, 0.1);
-  padding: 10px 20px;
-  border-radius: 25px;
+  gap: 12px;
+  background: rgba(129, 140, 248, 0.1);
+  padding: 8px 20px;
+  border-radius: 14px;
+  border: 1px solid rgba(129, 140, 248, 0.2);
+  transition: all 0.3s ease;
+}
+
+.user-info:hover {
+  background: rgba(129, 140, 248, 0.15);
+  border-color: rgba(129, 140, 248, 0.3);
 }
 
 .user-info span {
-  color: #4a5568;
+  color: #e2e8f0;
   font-size: 14px;
   font-weight: 500;
   font-family: "Vazirmatn", sans-serif;
 }
 
 @media (max-width: 768px) {
-  .dashboard-header {
-    padding: 16px 20px;
-  }
+  .dashboard-header { padding: 12px 20px; }
+  .dashboard-header h1 { font-size: 18px; }
 }
 
 @media (max-width: 480px) {
-  .dashboard-header {
-    padding: 12px 16px;
-  }
-
-  .dashboard-header h1 {
-    font-size: 18px;
-  }
-
-  .header-left {
-    gap: 12px;
-  }
-}
-
-@media (max-width: 360px) {
-  .dashboard-header {
-    padding: 10px 12px;
-  }
-
-  .dashboard-header h1 {
-    font-size: 16px;
-  }
-
-  .user-info span {
-    font-size: 12px;
-  }
+  .user-info span { display: none; }
+  .user-info::before { content: '👤'; font-size: 18px; }
 }
 </style>
 

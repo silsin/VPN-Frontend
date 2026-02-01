@@ -135,31 +135,36 @@ watch(() => configStore.filterType, (newValue) => {
 
 .stats-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
-  gap: 16px;
-  transition: all 0.3s ease;
+  gap: 20px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-8px) scale(1.02);
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(129, 140, 248, 0.3);
 }
 
 .stat-icon {
-  font-size: 32px;
+  font-size: 36px;
+  background: rgba(129, 140, 248, 0.1);
+  padding: 12px;
+  border-radius: 18px;
+  line-height: 1;
 }
 
 .stat-content {
@@ -167,24 +172,30 @@ watch(() => configStore.filterType, (newValue) => {
 }
 
 .stat-number {
-  font-size: 28px;
-  font-weight: 700;
-  color: #2d3748;
+  font-size: 32px;
+  font-weight: 800;
+  color: #ffffff;
   font-family: "Vazirmatn", sans-serif;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
+  letter-spacing: -1px;
 }
 
 .stat-label {
   font-size: 14px;
-  color: #718096;
+  color: #94a3b8;
   font-family: "Vazirmatn", sans-serif;
+  font-weight: 500;
 }
 
 .search-filter-row {
   display: flex;
-  gap: 20px;
+  gap: 24px;
   align-items: center;
   flex-wrap: wrap;
+  background: rgba(15, 23, 42, 0.3);
+  padding: 20px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .search-box {
@@ -195,43 +206,43 @@ watch(() => configStore.filterType, (newValue) => {
 
 .search-input {
   width: 100%;
-  padding: 14px 48px 14px 20px;
-  border: 2px solid rgba(102, 126, 234, 0.2);
-  border-radius: 12px;
+  padding: 16px 52px 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
   font-size: 16px;
   font-family: "Vazirmatn", sans-serif;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.2);
+  color: #ffffff;
   transition: all 0.3s ease;
   outline: none;
 }
 
 .search-input:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #818cf8;
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.1);
 }
 
 .search-icon {
   position: absolute;
-  left: 16px;
+  left: 20px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 18px;
-  color: #a0aec0;
+  font-size: 20px;
+  color: #64748b;
 }
 
 .filter-buttons {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .filter-btn {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(102, 126, 234, 0.2);
-  color: #4a5568;
-  padding: 12px 20px;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  padding: 14px 24px;
+  border-radius: 16px;
   font-weight: 600;
   font-family: "Vazirmatn", sans-serif;
   cursor: pointer;
@@ -239,29 +250,30 @@ watch(() => configStore.filterType, (newValue) => {
 }
 
 .filter-btn:hover {
-  border-color: #667eea;
-  background: rgba(102, 126, 234, 0.05);
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
 .filter-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-color: #667eea;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  border-color: transparent;
   color: white;
+  box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
 }
 
 .search-results {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 16px;
-  padding: 12px 16px;
-  background: rgba(102, 126, 234, 0.1);
-  border-radius: 8px;
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  margin-top: 20px;
+  padding: 14px 20px;
+  background: rgba(129, 140, 248, 0.1);
+  border-radius: 14px;
+  border: 1px solid rgba(129, 140, 248, 0.2);
 }
 
 .results-text {
-  color: #2d3748;
+  color: #e2e8f0;
   font-weight: 600;
   font-family: "Vazirmatn", sans-serif;
 }
@@ -269,7 +281,7 @@ watch(() => configStore.filterType, (newValue) => {
 .clear-filters-btn {
   background: none;
   border: none;
-  color: #667eea;
+  color: #818cf8;
   font-weight: 600;
   font-family: "Vazirmatn", sans-serif;
   cursor: pointer;
