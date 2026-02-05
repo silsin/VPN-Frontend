@@ -11,7 +11,10 @@ export const useConfigStore = defineStore('config', () => {
   const stats = ref({
     total: 0,
     links: 0,
-    jsons: 0
+    jsons: 0,
+    openvpns: 0,
+    sstps: 0,
+    sshs: 0
   })
 
   // Helper to normalize config from API
@@ -35,8 +38,12 @@ export const useConfigStore = defineStore('config', () => {
 
   // Helper to denormalize config for API
   const denormalizeConfig = (config) => {
+    // Base64 encode content to bypass WAF checks
+    const encodedContent = btoa(unescape(encodeURIComponent(config.content)))
+    
     return {
       ...config,
+      content: encodedContent,
       type: config.type === 'link' ? 'v2ray_link' : (config.type === 'json' ? 'json_config' : config.type)
     }
   }
@@ -74,7 +81,10 @@ export const useConfigStore = defineStore('config', () => {
       stats.value = {
         total: response.data.total,
         links: response.data.linkCount,
-        jsons: response.data.jsonCount
+        jsons: response.data.jsonCount,
+        openvpns: response.data.openvpnCount || 0,
+        sstps: response.data.sstpCount || 0,
+        sshs: response.data.sshCount || 0
       }
     } catch (e) {
       console.error('Error loading stats:', e)

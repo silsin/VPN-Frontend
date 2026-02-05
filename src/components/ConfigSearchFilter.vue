@@ -23,6 +23,27 @@
           <div class="stat-label">کانفیگ JSON</div>
         </div>
       </div>
+      <div class="stat-card">
+        <div class="stat-icon">🛡️</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ stats.openvpns }}</div>
+          <div class="stat-label">OpenVPN</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔒</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ stats.sstps }}</div>
+          <div class="stat-label">SSTP</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⌨️</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ stats.sshs }}</div>
+          <div class="stat-label">SSH</div>
+        </div>
+      </div>
     </div>
 
     <!-- جستجو و فیلتر -->
@@ -58,7 +79,28 @@
           :class="{ active: localFilterType === 'json' }"
           @click="setFilter('json')"
         >
-          کانفیگ JSON
+          JSON
+        </button>
+        <button
+          class="filter-btn"
+          :class="{ active: localFilterType === 'openvpn' }"
+          @click="setFilter('openvpn')"
+        >
+          OpenVPN
+        </button>
+        <button
+          class="filter-btn"
+          :class="{ active: localFilterType === 'sstp' }"
+          @click="setFilter('sstp')"
+        >
+          SSTP
+        </button>
+        <button
+          class="filter-btn"
+          :class="{ active: localFilterType === 'ssh' }"
+          @click="setFilter('ssh')"
+        >
+          SSH
         </button>
       </div>
     </div>
