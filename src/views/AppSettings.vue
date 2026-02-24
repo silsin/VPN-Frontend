@@ -177,6 +177,139 @@
               description="نمایش دیالوگ برای انتخاب سرور هنگام اتصال"
             />
           </template>
+
+          <!-- تنظیمات تایمرها -->
+          <template v-if="category === 'timers'">
+            <div class="settings-section">
+              <h3>تایمرهای اتصال</h3>
+              
+              <SettingInput
+                id="auto-disconnect-timer"
+                label="تایمر قطع خودکار (دقیقه)"
+                type="number"
+                v-model.number="settings.autoDisconnectTimer"
+                :min="1"
+                :max="60"
+                placeholder="30"
+                description="مدت زمان تا قطع خودکار اتصال VPN"
+              />
+
+              <SettingInput
+                id="connection-timeout"
+                label="تایم‌اوت اتصال (ثانیه)"
+                type="number"
+                v-model.number="settings.connectionTimeout"
+                :min="5"
+                :max="60"
+                placeholder="15"
+                description="حداکثر زمان انتظار برای برقراری اتصال"
+              />
+
+              <SettingInput
+                id="status-polling-interval"
+                label="فاصله بررسی وضعیت (ثانیه)"
+                type="number"
+                v-model.number="settings.statusPollingInterval"
+                :min="1"
+                :max="10"
+                placeholder="3"
+                description="فاصله زمانی بررسی وضعیت اتصال"
+              />
+            </div>
+
+            <div class="settings-section">
+              <h3>تایمرهای آمار</h3>
+              
+              <SettingToggle
+                id="enable-vpn-statistics"
+                label="جمع‌آوری آمار VPN"
+                v-model="settings.enableVpnStatistics"
+                description="جمع‌آوری آمار مصرف و عملکرد VPN"
+              />
+
+              <SettingInput
+                v-if="settings.enableVpnStatistics"
+                id="statistics-update-interval"
+                label="فاصله به‌روزرسانی آمار (ثانیه)"
+                type="number"
+                v-model.number="settings.statisticsUpdateInterval"
+                :min="5"
+                :max="30"
+                placeholder="5"
+                description="فاصله زمانی به‌روزرسانی آمار"
+              />
+
+              <SettingToggle
+                id="enable-protocol-statistics"
+                label="آمار پروتکل‌ها"
+                v-model="settings.enableProtocolStatistics"
+                description="جمع‌آوری آمار پروتکل‌های مختلف VPN"
+              />
+
+              <SettingToggle
+                id="enable-ikev2-statistics"
+                label="آمار IKEv2"
+                v-model="settings.enableIkev2Statistics"
+                description="جمع‌آوری آمار اختصاصی پروتکل IKEv2"
+              />
+            </div>
+
+            <div class="settings-section">
+              <h3>تایمرهای عملکرد</h3>
+              
+              <SettingInput
+                id="debounce-delay"
+                label="تأخیر Debounce (میلی‌ثانیه)"
+                type="number"
+                v-model.number="settings.debounceDelay"
+                :min="100"
+                :max="1000"
+                :step="100"
+                placeholder="300"
+                description="تأخیر برای جلوگیری از اجرای مکرر عملیات"
+              />
+
+              <SettingInput
+                id="background-ping-interval"
+                label="فاصله Ping پس‌زمینه (ثانیه)"
+                type="number"
+                v-model.number="settings.backgroundPingInterval"
+                :min="30"
+                :max="300"
+                placeholder="60"
+                description="فاصله زمانی بررسی پینگ سرورها"
+              />
+
+              <SettingInput
+                id="server-selection-delay"
+                label="تأخیر انتخاب سرور (ثانیه)"
+                type="number"
+                v-model.number="settings.serverSelectionDelay"
+                :min="1"
+                :max="10"
+                placeholder="3"
+                description="تأخیر قبل از انتخاب خودکار سرور"
+              />
+            </div>
+
+            <div class="settings-section">
+              <h3>تایمرهای کاربر</h3>
+              
+              <SettingToggle
+                id="enable-session-timer"
+                label="تایمر نشست کاربر"
+                v-model="settings.enableSessionTimer"
+                description="ثبت مدت زمان استفاده کاربر از VPN"
+              />
+
+              <SettingToggle
+                id="enable-connection-tracking"
+                label="ردیابی اتصال"
+                v-model="settings.enableConnectionTracking"
+                description="ردیابی تاریخچه اتصال‌های کاربر"
+              />
+            </div>
+          </template>
         </template>
       </SettingsTabs>
     </div>
@@ -306,6 +439,37 @@ const saveCategorySettings = (categoryId) => {
   line-height: 1.8;
   margin: 0;
   font-family: "Vazirmatn", sans-serif;
+}
+
+.settings-section {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.settings-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.settings-section h3 {
+  color: #2d3748;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  font-family: "Vazirmatn", sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-section h3::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
 }
 </style>
 

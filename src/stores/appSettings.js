@@ -33,6 +33,29 @@ const defaultSettings = {
   server: {
     forceServerSelection: false,
     enableServerDialog: true
+  },
+
+  // تنظیمات تایمرها
+  timers: {
+    // تایمرهای اتصال
+    autoDisconnectTimer: 30,
+    connectionTimeout: 15,
+    statusPollingInterval: 3,
+    
+    // تایمرهای آمار
+    enableVpnStatistics: true,
+    statisticsUpdateInterval: 5,
+    enableProtocolStatistics: true,
+    enableIkev2Statistics: false,
+    
+    // تایمرهای عملکرد
+    debounceDelay: 300,
+    backgroundPingInterval: 60,
+    serverSelectionDelay: 3,
+    
+    // تایمرهای کاربر
+    enableSessionTimer: true,
+    enableConnectionTracking: true
   }
 }
 
@@ -60,7 +83,8 @@ export const useAppSettingsStore = defineStore('appSettings', () => {
           // but simplest verification first:
           general: { ...defaultSettings.general, ...(response.data.general || {}) },
           notifications: { ...defaultSettings.notifications, ...(response.data.notifications || {}) },
-          server: { ...defaultSettings.server, ...(response.data.server || {}) }
+          server: { ...defaultSettings.server, ...(response.data.server || {}) },
+          timers: { ...defaultSettings.timers, ...(response.data.timers || {}) }
         }
       }
     } catch (e) {
@@ -145,7 +169,8 @@ export const useAppSettingsStore = defineStore('appSettings', () => {
         ...imported,
         general: { ...defaultSettings.general, ...(imported.general || {}) },
         notifications: { ...defaultSettings.notifications, ...(imported.notifications || {}) },
-        server: { ...defaultSettings.server, ...(imported.server || {}) }
+        server: { ...defaultSettings.server, ...(imported.server || {}) },
+        timers: { ...defaultSettings.timers, ...(imported.timers || {}) }
       }
       settingsChanged.value = true
       await saveSettings()
@@ -183,6 +208,12 @@ const settingsCategories = [
     name: 'تنظیمات سرور',
     icon: '🖥️',
     description: 'مدیریت انتخاب و اتصال به سرورها'
+  },
+  {
+    id: 'timers',
+    name: 'تایمرها',
+    icon: '⏱️',
+    description: 'تنظیمات تایمرهای سیستم و عملکرد'
   }
 ]
 
