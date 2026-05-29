@@ -317,7 +317,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import DashboardLayout from "../components/DashboardLayout.vue"
 import SettingsTabs from "../components/SettingsTabs.vue"
 import SettingInput from "../components/settings/SettingInput.vue"
@@ -329,7 +329,20 @@ import { useAppSettingsStore } from '../stores/appSettings'
 const settingsStore = useAppSettingsStore()
 
 // Import computed properties
-const { settingsCategories } = settingsStore
+const { settingsCategories, hasCategoryChanges, saveTimerSettings, loadTimerSettings } = settingsStore
+const settings = computed(() => settingsStore.getCategorySettings('timers'))
+
+// Load timer settings when component mounts
+onMounted(async () => {
+  await loadTimerSettings()
+})
+
+// Watch for changes in timer settings
+watch(settings, (newSettings, oldSettings) => {
+  if (JSON.stringify(newSettings) !== JSON.stringify(oldSettings)) {
+    settingsStore.updateSettings('timers', newSettings)
+  }
+}, { deep: true })
 
 const exportSettings = () => {
   try {
@@ -384,9 +397,31 @@ const resetSettings = () => {
   }
 }
 
-const saveCategorySettings = (categoryId) => {
-  settingsStore.saveSettings()
-  alert(`تنظیمات ${settingsCategories.value.find(cat => cat.id === categoryId)?.name} ذخیره شد!`)
+const saveCategorySettings = async (categoryId) => {
+  if (categoryId === 'timers') {
+    if (hasCategoryChanges(categoryId)) {
+      try {
+        await saveTimerSettings()
+        alert(`تنظیمات ${settingsCategories.value.find(cat => cat.id === categoryId)?.name} ذخیره شد!`)
+      } catch (error) {
+        alert('خطا در ذخیره تنظیمات: ' + error.message)
+      }
+    } else {
+      alert('هیچ تغییری برای ذخیره وجود ندارد!')
+    }
+  } else {
+    // For other categories, use the original saveSettings function
+    if (hasCategoryChanges(categoryId)) {
+      try {
+        await settingsStore.saveSettings()
+        alert(`تنظیمات ${settingsCategories.value.find(cat => cat.id === categoryId)?.name} ذخیره شد!`)
+      } catch (error) {
+        alert('خطا در ذخیره تنظیمات: ' + error.message)
+      }
+    } else {
+      alert('هیچ تغییری برای ذخیره وجود ندارد!')
+    }
+  }
 }
 </script>
 

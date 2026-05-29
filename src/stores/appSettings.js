@@ -96,16 +96,74 @@ export const useAppSettingsStore = defineStore('appSettings', () => {
     }
   }
 
+  // بارگذاری فقط تنظیمات تایمرها
+  const loadTimerSettings = async () => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await api.get('/timers/config')
+      if (response.data) {
+        settings.value.timers = { ...defaultSettings.timers, ...response.data }
+      }
+    } catch (e) {
+      console.error('Error loading timer settings:', e)
+      error.value = 'خطا در بارگذاری تنظیمات تایمرها'
+    } finally {
+      loading.value = false
+    }
+  }
+
   // ذخیره تنظیمات در API
   const saveSettings = async () => {
     loading.value = true
     try {
-      await api.put('/settings', settings.value)
+      // Get CSRF token from meta tag or cookie
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
+                       document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1]
+      
+      // Send only timers category to reduce payload size
+      const timersData = settings.value.timers
+      const response = await api.put('/timers/config', timersData, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          ...(csrfToken && { 'X-XSRF-TOKEN': csrfToken })
+        }
+      })
       settingsChanged.value = false
+      return response.data
     } catch (e) {
       console.error('Error saving app settings:', e)
       error.value = 'خطا در ذخیره تنظیمات'
-      throw e // Let UI handle or display specific error
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // ذخیره فقط تنظیمات تایمرها
+  const saveTimerSettings = async () => {
+    loading.value = true
+    try {
+      // Get CSRF token from meta tag or cookie
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
+                       document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1]
+      
+      // Send only timers category to reduce payload size
+      const timersData = settings.value.timers
+      const response = await api.put('/timers/config', timersData, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          ...(csrfToken && { 'X-XSRF-TOKEN': csrfToken })
+        }
+      })
+      settingsChanged.value = false
+      return response.data
+    } catch (e) {
+      console.error('Error saving timer settings:', e)
+      error.value = 'خطا در ذخیره تنظیمات تایمرها'
+      throw e
     } finally {
       loading.value = false
     }
@@ -130,7 +188,7 @@ export const useAppSettingsStore = defineStore('appSettings', () => {
     if (settings.value[category] && settings.value[category][key] !== undefined) {
       settings.value[category][key] = value
       settingsChanged.value = true
-      saveSettings()
+      // Don't auto-save for manual control
     }
   }
 
@@ -187,7 +245,24 @@ export const useAppSettingsStore = defineStore('appSettings', () => {
   }
 
   // بررسی تغییر تنظیمات
-  const hasUnsavedChanges = computed(() => settingsChanged.value)
+  const hasUnsavedChanges = computed(() => {
+    // Compare current settings with defaults to detect changes
+    const current = settings.value
+    const defaults = defaultSettings
+    
+    // Deep comparison for changes
+    return JSON.stringify(current) !== JSON.stringify(defaults)
+  })
+
+  // بررسی تغییرات در یک دسته خاص
+  const hasCategoryChanges = (category) => {
+    const current = settings.value[category]
+    const defaults = defaultSettings[category]
+    
+    if (!current || !defaults) return false
+    
+    return JSON.stringify(current) !== JSON.stringify(defaults)
+  }
 
 // گرفتن تنظیمات بر اساس دسته‌بندی
 const settingsCategories = [
@@ -226,10 +301,13 @@ const settingsCategories = [
     settingsChanged,
     settingsCategories,
     hasUnsavedChanges,
+    hasCategoryChanges,
     loading,
     error,
     loadSettings,
+    loadTimerSettings,
     saveSettings,
+    saveTimerSettings,
     updateSettings,
     setSetting,
     getSetting,
