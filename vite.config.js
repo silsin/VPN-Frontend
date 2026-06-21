@@ -41,5 +41,14 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['vue-router']
+  },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://ziva-vpn.online',
+        changeOrigin: true,
+        secure: false, // set to true once the backend has a valid SSL cert
+      }
+    }
   }
 })
